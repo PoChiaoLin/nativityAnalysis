@@ -5,16 +5,15 @@ Created on Wed Feb  1 11:02:40 2023
 @author: USER
 """
 
-import requests
 from bs4 import BeautifulSoup
 import re
 import pyrebase
 import pandas as pd
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.common.by import By
 import time
 
 #config 的資料須待最終儲存位置修改
@@ -45,9 +44,17 @@ def getComData(comNo):
         Select(browser.find_element(By.ID,'RPT_CAT')).select_by_value('XX_M_QUAR')
         Select(browser.find_element(By.ID,'QRY_TIME')).select_by_value(year)
         time.sleep(5)
-        element = WebDriverWait(browser, 3, 0.1).until(
-            expected_conditions.presence_of_element_located((By.CLASS_NAME, 'b1'))
-        )
+        try:
+            # 等待當季字樣出現
+            WebDriverWait(browser, 3, 0.1).until(
+                expected_conditions.text_to_be_present_in_element((By.XPATH, "//span[contains(@style, 'color:gray;font-size:9pt;') and text()='(當季)']"), "(當季)")
+            )
+           
+        except:
+            # 處理異常
+            # ...
+            print("未抓取")
+            break
         soup=BeautifulSoup(browser.page_source,"html.parser")
 
         main = soup.select_one('table.b1.p4_4.r0_10.row_mouse_over')
@@ -79,6 +86,10 @@ for i in range(2330, 2332):
     data1 = dict(zip(period, roeVaule))
     data1["stockcode"] = i
     database.child('RoeValue').push(data1)
+
+
+
+    
 
 
 
