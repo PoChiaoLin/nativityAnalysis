@@ -1,5 +1,4 @@
-datas2 = {}#產業名稱跟屬性容器的內容容器
-t_list = []#產業類別容器
+t_list = []#產業類別,產業名稱跟屬性容器的內容容器容器
 linkData = []#連結容器
 
 #第一步請求url
@@ -17,7 +16,7 @@ links = soup.find("div",class_="industries-list").find_all("a")
 for link in links:
     linkData.append("https://statementdog.com/"+link.get("href"))
 
-#第3步
+#第3步迴圈每個產業類別的url跟上述步驟結合
 
 
 
@@ -37,3 +36,7 @@ for url in linkData:
 
             t_list[t].append([li1,li2])
 print(t_list)
+import pandas as pd
+
+df = pd.DataFrame(t_list)
+
