@@ -1,1 +1,39 @@
-123123
+datas2 = {}#產業名稱跟屬性容器的內容容器
+t_list = []#產業類別容器
+linkData = []#連結容器
+
+#第一步請求url
+#並產生 產業類別容器
+resp = requests.get("https://statementdog.com/taiex")
+soup = BeautifulSoup(resp.text,"lxml")
+titles= soup.find_all('h2',class_ = 'industry-item-title')
+#print(titles)測試
+for title in titles:
+    t_list.append([title.text])
+    
+    
+#第2步產生連結容器    
+links = soup.find("div",class_="industries-list").find_all("a")
+for link in links:
+    linkData.append("https://statementdog.com/"+link.get("href"))
+
+#第3步
+
+
+
+for url in linkData:
+    resp2 = requests.get(url)
+    soup2 = BeautifulSoup(resp2.text,"lxml")
+    colums = soup2.find("div",class_="industry-ranking-list-header").text.replace("\n",",").strip(",").split(",")
+
+    colums.pop(0)
+    del colums[1:3]
+    #print(colums)#產業名稱跟屬性容器
+    for t in range(len(t_list)):
+        uls = soup2.find("div",class_="industry-ranking-list-body").find_all("ul")
+        for ul in uls:
+            li1 = ul.find_all("li")[1].text.strip()
+            li2 = ul.find_all("li")[4].text
+
+            t_list[t].append([li1,li2])
+print(t_list)
