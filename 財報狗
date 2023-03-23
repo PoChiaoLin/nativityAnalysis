@@ -1,3 +1,5 @@
+import requests
+from bs4 import BeautifulSoup
 t_list = []#產業類別,產業名稱跟屬性容器的內容容器容器
 linkData = []#連結容器
 
