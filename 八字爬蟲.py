@@ -12,6 +12,7 @@ payload1 = {
     "_Hour": "9",
     "_sex": "M",
     "_earth": "N",
+    "_method": "A",
     "txt_eight": "",
     "txt_twelve": "",
     "txt_sun_date": "",

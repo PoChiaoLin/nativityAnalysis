@@ -39,22 +39,22 @@ def getComData(comNo):
     url = 'https://goodinfo.tw/tw/StockFinDetail.asp?RPT_CAT=XX_M_QUAR_ACC&STOCK_ID={}'.format(comNo)
     browser=webdriver.Chrome()
     browser.get(url) 
-    years = ["20224", "20202", "20174", "201502"]
+    years = ["20224", "20202", "20174", "20152"]
     for year in years:
         Select(browser.find_element(By.ID,'RPT_CAT')).select_by_value('XX_M_QUAR')
         Select(browser.find_element(By.ID,'QRY_TIME')).select_by_value(year)
         time.sleep(5)
-        try:
-            # 等待當季字樣出現
-            WebDriverWait(browser, 3, 0.1).until(
-                expected_conditions.text_to_be_present_in_element((By.XPATH, "//span[contains(@style, 'color:gray;font-size:9pt;') and text()='(當季)']"), "(當季)")
-            )
+        # try:
+        #     # 等待當季字樣出現
+        #     WebDriverWait(browser, 3, 0.1).until(
+        #         expected_conditions.text_to_be_present_in_element((By.XPATH, "//span[contains(@style, 'color:gray;font-size:9pt;') and text()='(當季)']"), "(當季)")
+        #     )
            
-        except:
-            # 處理異常
-            # ...
-            print("未抓取")
-            break
+        # except:
+        #     # 處理異常
+        #     # ...
+        #     print("未抓取")
+        #     break
         soup=BeautifulSoup(browser.page_source,"html.parser")
 
         main = soup.select_one('table.b1.p4_4.r0_10.row_mouse_over')
@@ -83,7 +83,7 @@ def getComData(comNo):
 
 for i in range(2330, 2332):
     period, roeVaule = getComData(i)
-    data1 = dict(zip(period, roeVaule))
+    data1 = dict(zip(str(period), str(roeVaule)))
     data1["stockcode"] = i
     database.child('RoeValue').push(data1)
 
