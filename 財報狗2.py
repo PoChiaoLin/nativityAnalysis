@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-data = {}
+
 t_list = []#產業類別容器
 linkData = []#連結容器
 
@@ -18,7 +18,7 @@ links = soup.find("div",class_="industries-list").find_all("a")
 for link in links:
     linkData.append("https://statementdog.com/"+link.get("href"))
 
-#第三步產生一個dict
+
 
 #print(linkData)
 resp2_1 = requests.get(linkData[0]) 
@@ -34,11 +34,15 @@ colum[0] = "股票代碼"
 print(colum)#產業名稱跟屬性容器
 
    
-colums   = [colum[0],colum[1],colum[2]]
-for t in t_list:
-    data[t] = {colums[0]: [], colums[1]: [],colums[2]:[]}
 
- #第4步上帝創造一切
+#第3部 產生 綜合容器
+colums = {}
+for d1 in colum:
+    colums[d1]=[]
+colums
+
+
+#第四部 上帝創造一切
 
 for t, url in zip(t_list, linkData):
     resp2 = requests.get(url)
@@ -48,12 +52,14 @@ for t, url in zip(t_list, linkData):
     for ul in uls:
         li1 = ul.find_all("li")[1].text.strip().split(" ")
         li2 = ul.find_all("li")[4].text
-        data[t][colums[0]].append(li1[0])
-        data[t][colums[1]].append(li1[1])
-        data[t][colums[2]].append(li2)    
-        
+        colums['股票代碼'].append(li1[0])
+        colums['公司名稱'].append(li1[1])
+        colums['所屬產業'].append(t+"_"+li2) 
+      
 import pandas as pd
 
-df = pd.DataFrame(data)            
-print(df)
+df = pd.DataFrame(colums)
+df
+
+    
 
