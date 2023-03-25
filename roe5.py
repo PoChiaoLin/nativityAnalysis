@@ -33,7 +33,7 @@ def getComData(comNo):
     url = 'https://goodinfo.tw/tw/StockFinDetail.asp?RPT_CAT=XX_M_QUAR_ACC&STOCK_ID={}'.format(comNo)
     browser=webdriver.Chrome()
     browser.get(url) 
-    years = ["20224", "20202", "20174", "20152"]
+    years = ["20224", "20202",]
     for year in years:
         Select(browser.find_element(By.ID,'RPT_CAT')).select_by_value('XX_M_QUAR')
         time.sleep(6)
@@ -138,13 +138,16 @@ data = df.to_dict(orient='records')
 
 #------------------------------------------
 for i in data:
-    period, roeVaule = getComData(int(i["股票代碼"]))
-    data1 = {}
-    for j in range(len(period)):
-        for k in range(len(period[j])):
-            data1[str(period[j][k])] = str(roeVaule[j][k])
-    data1["股票代碼"] = i
-    database.child('RoeValue').push(data1)
+    if "-KY" in i["公司名稱"]:
+        continue
+    else:
+        period, roeVaule = getComData(int(i["股票代碼"]))
+        data1 = {}
+        for j in range(len(period)):
+            for k in range(len(period[j])):
+                data1[str(period[j][k])] = str(roeVaule[j][k])
+        data1["股票代碼"] = i
+        database.child('RoeValue').push(data1)
 print("上傳完畢")
 
 

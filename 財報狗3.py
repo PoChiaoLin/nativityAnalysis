@@ -65,10 +65,14 @@ df2 = pd.read_excel('產業分類.xlsx')
 data2 = df2.to_dict(orient='records')
 
 for dict_a in data:
-    for dict_b in data2:
-        if dict_a['所屬產業'] == dict_b['所屬產業']:
-            dict_a['godOfJoy'] = dict_b['godOfJoy']
-            break
+    if "-KY" in dict_a["公司名稱"]:
+        continue
+    else:
+        for dict_b in data2:
+            if dict_a['所屬產業'] == dict_b['所屬產業']:
+                data['godOfJoy'] = dict_b['godOfJoy']
+                break
+
 import pyrebase
 
 config = {
@@ -85,8 +89,21 @@ firebase = pyrebase.initialize_app(config)
 
 database = firebase.database()
 
-for d in data:
-    database.child('公司資料').push(d)
+for dict_c in data:
+    for i in dict_c["godOfJoy"]:
+        if i == "金" :
+            database.child('公司資料').child("金").push(dict_c)
+        elif i == "木" :
+            database.child('公司資料').child("木").push(dict_c)
+        elif i == "水" :
+            database.child('公司資料').child("水").push(dict_c)
+        elif i == "火" :
+            database.child('公司資料').child("火").push(dict_c)
+        elif i == "土" :
+            database.child('公司資料').child("土").push(dict_c)
+        else:
+            print("無匹配")
+
 
 
 
