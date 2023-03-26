@@ -37,7 +37,12 @@ def getComData(comNo):
     for year in years:
         Select(browser.find_element(By.ID,'RPT_CAT')).select_by_value('XX_M_QUAR')
         time.sleep(6)
-        Select(browser.find_element(By.ID,'QRY_TIME')).select_by_value(year)
+        try:
+            Select(browser.find_element(By.ID,'QRY_TIME')).select_by_value(year)
+        except:
+            Select(browser.find_element(By.ID,'QRY_TIME')).select_by_value(str(int(year)-1))
+            print("{}沒有{}資料".format(comNo, year))
+            continue
         time.sleep(5)
         # try:
         #     # 等待當季字樣出現
@@ -73,7 +78,7 @@ def getComData(comNo):
     
             time.sleep(5)
         except:
-            print([comNo, year])
+            print("{}的{}資料缺漏".format(comNo, year))
             continue
     return qFinal, roeFinal
         
@@ -146,13 +151,15 @@ for i in data:
     else:
         period, roeVaule = getComData(int(i["股票代碼"]))
         data1 = {}
+        data1["股票代碼"] = i['股票代碼']
         try:
             for j in range(len(period)):
                 for k in range(len(period[j])):
                     data1[str(period[j][k])] = str(roeVaule[j][k])
-            data1["股票代碼"] = i
+            data1["股票代碼"] = i['股票代碼']
             database.child('RoeValue').push(data1)
         except:
+            print("{}未成功上傳".format(i['股票代碼']) )
             continue
 print("上傳完畢")
 
