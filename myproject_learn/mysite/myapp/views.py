@@ -286,3 +286,17 @@ def getLotto(request):
     year = "105"
     month = "6"
     return HttpResponse(lotto(year, month))
+
+from django.shortcuts import render
+from . import horoscope_scraper  # 假设你的爬虫代码在同一个应用中的 horoscope_scraper.py 文件中
+
+def horoscope_view(request):
+    horoscope_str = horoscope_scraper.horoscope_str
+    nativityAnalysis_str = horoscope_scraper.nativityAnalysis_str
+
+    context = {
+        'horoscope': horoscope_str,
+        'nativity_analysis': nativityAnalysis_str
+    }
+    return render(request, 'your_app_name/horoscope.html', context)
+
