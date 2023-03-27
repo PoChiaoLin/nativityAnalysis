@@ -286,17 +286,34 @@ def getLotto(request):
     year = "105"
     month = "6"
     return HttpResponse(lotto(year, month))
+# 為停新增
+from django.http import JsonResponse
+import re
+import requests
+from bs4 import BeautifulSoup
 
-from django.shortcuts import render
-from . import horoscope_scraper  # 假设你的爬虫代码在同一个应用中的 horoscope_scraper.py 文件中
+def get_horoscope_data(request):
+    session = requests.session()
+    myHeaders = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'}
 
-def horoscope_view(request):
-    horoscope_str = horoscope_scraper.horoscope_str
-    nativityAnalysis_str = horoscope_scraper.nativityAnalysis_str
-
-    context = {
-        'horoscope': horoscope_str,
-        'nativity_analysis': nativityAnalysis_str
+    payload1 = {
+        # ... 省略其他参数 ...
     }
-    return render(request, 'your_app_name/horoscope.html', context)
+
+    a = session.post("https://www.dearmoney.com.tw/eightwords/result_eight_words_page", data=payload1, headers=myHeaders)
+    # ... 省略大部分代码 ...
+
+    def decode_bytes(byte_string):
+        return byte_string.decode('unicode_escape').encode('latin1').decode('utf-8')
+
+    horoscope_str = decode_bytes(horoscope_bytes)
+    nativityAnalysis_str = decode_bytes(nativityAnalysis_bytes)
+    godOfJoy_str = decode_bytes(godOfJoy_bytes)
+
+    return JsonResponse({
+        'horoscope': horoscope_str,
+        'nativity_analysis': nativityAnalysis_str,
+        'god_of_joy': godOfJoy_str
+    })
+
 
