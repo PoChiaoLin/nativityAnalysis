@@ -45,3 +45,13 @@ urlpatterns = [
     url(r'^logout/', views.logout, name='logout'),
 
 ]
+
+#徐尉庭新增
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    # ... 省略其他 URL 路径 ...
+    path('get_horoscope_data/', views.get_horoscope_data, name='get_horoscope_data'),
+]
+
