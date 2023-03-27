@@ -39,11 +39,24 @@ def getComData(comNo):
         time.sleep(6)
         try:
             Select(browser.find_element(By.ID,'QRY_TIME')).select_by_value(year)
+            time.sleep(5)
         except:
-            Select(browser.find_element(By.ID,'QRY_TIME')).select_by_value(str(int(year)-1))
-            print("{}沒有{}資料".format(comNo, year))
-            continue
-        time.sleep(5)
+            try:
+                print("{}沒有{}資料".format(comNo, year))
+                Select(browser.find_element(By.ID,'QRY_TIME')).select_by_value(str(int(year)-1))
+                time.sleep(5)
+            except:
+                try:
+                    print("{}沒有{}資料".format(comNo, str(int(year)-1)))
+                    Select(browser.find_element(By.ID,'QRY_TIME')).select_by_value(str(int(year)-2))
+                    time.sleep(5)
+                except:
+                    print("{}沒有{}資料".format(comNo, str(int(year)-2)))
+                    continue
+                    time.sleep(5)       
+                
+                
+                
         # try:
         #     # 等待當季字樣出現
         #     WebDriverWait(browser, 3, 0.1).until(
