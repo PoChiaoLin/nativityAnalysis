@@ -45,3 +45,12 @@ urlpatterns = [
     url(r'^logout/', views.logout, name='logout'),
 
 ]
+
+
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    # ... 其他 URL 路径
+    path('horoscope/', views.horoscope_view, name='horoscope'),
+]
