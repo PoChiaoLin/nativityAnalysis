@@ -31,47 +31,61 @@ def getComData(comNo):
     qFinal = []
     roeFinal = []
     url = 'https://goodinfo.tw/tw/StockFinDetail.asp?RPT_CAT=XX_M_QUAR_ACC&STOCK_ID={}'.format(comNo)
-    browser=webdriver.Chrome()
-    browser.get(url) 
-    years = ["20224", "20202", "20174", "20152"]
-    for year in years:
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless') # 啟用隱藏模式
+    options.add_argument('--disable-gpu') # 禁用 GPU
+    options.add_argument('--no-sandbox') # 在 Docker 中運行 Chrome 時需要加上此參數
+    options.add_argument('--disable-dev-shm-usage') # 在 Docker 中運行 Chrome 時需要加上此參數
+    browser = webdriver.Chrome(options=options)
+    
+    time.sleep(10)
+    try:
         Select(browser.find_element(By.ID,'RPT_CAT')).select_by_value('XX_M_QUAR')
-        time.sleep(6)
-        Select(browser.find_element(By.ID,'QRY_TIME')).select_by_value(year)
-        time.sleep(5)
-        # try:
-        #     # 等待當季字樣出現
-        #     WebDriverWait(browser, 3, 0.1).until(
-        #         expected_conditions.text_to_be_present_in_element((By.XPATH, "//span[contains(@style, 'color:gray;font-size:9pt;') and text()='(當季)']"), "(當季)")
-        #     )
-           
-        # except:
-        #     # 處理異常
-        #     # ...
-        #     print("未抓取")
-        #     break
-        soup=BeautifulSoup(browser.page_source,"html.parser")
-
+    except:
+        print("{}網頁異常".format(comNo))
+        database.child("網頁異常-單季").push(comNo)
+        return
+    time.sleep(15)
+    browser.get(url)
+    try:
+        soup = BeautifulSoup(browser.page_source,"html.parser")
+    except:
+        print("{}網頁異常".format(comNo))
+        database.child("網頁異常-單季").push(comNo)
+        return
+    try:
         main = soup.select_one('table.b1.p4_4.r0_10.row_mouse_over')
         main_str = str(main)
         pattern = re.compile(r"滑鼠在此點一下, 可顯示公式說明")
         main_list = pattern.split(main_str)
         q = main_list[0]
-        roe = main_list[9]
         tempQ = q.split(r'</nobr></th>')
-        tempRoe = roe.split(r'nobr>')
         q2 = []
-        roe2 = []
         for i in tempQ:
             if len(i) == len(tempQ[1]):
                 q2.append(i.replace(r'<th><nobr>', ''))
         qFinal.append(q2)
-        for i in tempRoe:
-            if len(i) <= 9:
-                roe2.append(i.replace(r'</', ''))
-        roeFinal.append(roe2[1:])
-
-        time.sleep(5)
+        roe = main_list[9]
+        try:
+            if re.search("股東權益報酬率", roe):
+                # print("{}股東權益報酬率".format(comNo))
+                tempRoe = roe.split(r'nobr>')           
+                roe2 = []
+                for j in tempRoe:
+                    if len(j) <= 9:
+                        roe2.append(j.replace(r'</', ''))
+                roeFinal.append(roe2[1:])
+                time.sleep(5)
+            else:
+                print("{}無股東權益報酬率".format(comNo))
+                for k in range(len(qFinal)):
+                    roeFinal.append("-")
+        except:
+            print("{}ROE異常".format(comNo))
+    except:
+        print("{}的資料異常".format(comNo))
+    
+    time.sleep(10)
     return qFinal, roeFinal
         
 # -----------------------------------
@@ -137,17 +151,22 @@ df = pd.DataFrame(colums)
 data = df.to_dict(orient='records')
 
 #------------------------------------------
-for i in data:
-    if "-KY" in i["公司名稱"]:
+print("開始抓roe")
+for z in data:
+    if "-KY" in z["公司名稱"]:
         continue
     else:
-        period, roeVaule = getComData(int(i["股票代碼"]))
+        period, roeVaule = getComData(int(z["股票代碼"]))
         data1 = {}
-        for j in range(len(period)):
-            for k in range(len(period[j])):
-                data1[str(period[j][k])] = str(roeVaule[j][k])
-        data1["股票代碼"] = i
-        database.child('RoeValue').push(data1)
+        data1["股票代碼"] = z['股票代碼']
+        try:
+            for y in range(len(period)):
+                for x in range(len(period[y])):
+                    data1[str(period[y][x])] = str(roeVaule[y][x])
+            database.child('RoeValue單季').push(data1)
+        except:
+            print("{}未成功上傳".format(z['股票代碼']) )
+            continue
 print("上傳完畢")
 
 
