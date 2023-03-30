@@ -56,56 +56,56 @@ for t, url in zip(t_list, linkData):
         colums['公司名稱'].append(li1[1])
         colums['所屬產業'].append(t+"_"+li2) 
       
-import pandas as pd
+# import pandas as pd
 
-df = pd.DataFrame(colums)
-data = df.to_dict(orient='records')
+# df = pd.DataFrame(colums)
+# data = df.to_dict(orient='records')
 
-df2 = pd.read_excel('產業分類.xlsx')
-data2 = df2.to_dict(orient='records')
+# df2 = pd.read_excel('產業分類.xlsx')
+# data2 = df2.to_dict(orient='records')
 
-data3 = []
-for dict_a in data:
-    if "-KY" in dict_a["公司名稱"]:
-        continue
-    else:
-        for dict_b in data2:
-            if dict_a['所屬產業'] == dict_b['所屬產業']:
-                dict_a['godOfJoy'] = dict_b['godOfJoy']
-                data3.append(dict_a)
-                break
+# data3 = []
+# for dict_a in data:
+#     if "-KY" in dict_a["公司名稱"]:
+#         continue
+#     else:
+#         for dict_b in data2:
+#             if dict_a['所屬產業'] == dict_b['所屬產業']:
+#                 dict_a['godOfJoy'] = dict_b['godOfJoy']
+#                 data3.append(dict_a)
+#                 break
 
-import pyrebase
+# import pyrebase
 
-config = {
-  'apiKey': "AIzaSyCE-vHKK0MNrCcy-KAtK__0HW9hrRXM_M4",
-  'authDomain': "test1-bfab0.firebaseapp.com",
-  'projectId': "test1-bfab0",
-  'storageBucket': "test1-bfab0.appspot.com",
-  'messagingSenderId': "863152004967",
-  'appId': "1:863152004967:web:85cd44c032569b84d799c2",
-  'measurementId': "G-8ED4G9L00T",
-  'databaseURL': "https://test1-bfab0-default-rtdb.firebaseio.com",}
+# config = {
+#   'apiKey': "AIzaSyCE-vHKK0MNrCcy-KAtK__0HW9hrRXM_M4",
+#   'authDomain': "test1-bfab0.firebaseapp.com",
+#   'projectId': "test1-bfab0",
+#   'storageBucket': "test1-bfab0.appspot.com",
+#   'messagingSenderId': "863152004967",
+#   'appId': "1:863152004967:web:85cd44c032569b84d799c2",
+#   'measurementId': "G-8ED4G9L00T",
+#   'databaseURL': "https://test1-bfab0-default-rtdb.firebaseio.com",}
 
-firebase = pyrebase.initialize_app(config)
+# firebase = pyrebase.initialize_app(config)
 
-database = firebase.database()
+# database = firebase.database()
 
-for dict_c in data3:
-    for i in dict_c["godOfJoy"].split(","):
-        if i == "金" :
-            database.child('公司資料').child("金").push(dict_c)
-        elif i == "木" :
-            database.child('公司資料').child("木").push(dict_c)
-        elif i == "水" :
-            database.child('公司資料').child("水").push(dict_c)
-        elif i == "火" :
-            database.child('公司資料').child("火").push(dict_c)
-        elif i == "土" :
-            database.child('公司資料').child("土").push(dict_c)
-        else:
-            print(i)
-            print("無匹配")
+# for dict_c in data3:
+#     for i in dict_c["godOfJoy"].split(","):
+#         if i == "金" :
+#             database.child('公司資料').child("金").push(dict_c)
+#         elif i == "木" :
+#             database.child('公司資料').child("木").push(dict_c)
+#         elif i == "水" :
+#             database.child('公司資料').child("水").push(dict_c)
+#         elif i == "火" :
+#             database.child('公司資料').child("火").push(dict_c)
+#         elif i == "土" :
+#             database.child('公司資料').child("土").push(dict_c)
+#         else:
+#             print(i)
+#             print("無匹配")
 
 
 
