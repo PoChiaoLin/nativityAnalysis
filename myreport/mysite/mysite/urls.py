@@ -29,6 +29,6 @@ urlpatterns = [
 
     #徐尉庭增加(下面兩行)
     path('admin/', admin.site.urls),
-    path('', include('your_app_name.urls')),
+    path('', include('wordsapp.urls')),
     #
 ]
