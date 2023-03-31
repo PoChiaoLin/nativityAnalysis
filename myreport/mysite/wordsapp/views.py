@@ -201,3 +201,31 @@ def birthdaysave(request):
     time = database.child('Humandata').child('Time').get().val()
     gender = database.child('Humandata').child('Gender').get().val()
     return render(request, "birthdaysave.html", {"year": year, "month": month, "day": day, "time": time, "gender": gender})
+
+#徐尉庭增加(下面5個def)
+def dashboard(request):
+    return render(request, 'wordsapp/dashboard.html')
+
+def update_profile(request):
+    # 實現更新資料的邏輯
+    return redirect('dashboard')
+
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            return redirect('dashboard')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'wordsapp/change_password.html', {'form': form})
+
+def search_company(request):
+    # 實現查詢公司的邏輯
+    return render(request, 'wordsapp/search_company.html')
+
+def search_horoscope(request):
+    # 實現查詢八字的邏輯，您可以在這裡整合您之前提到的爬蟲程式
+    return render(request, 'wordsapp/search_horoscope.html')
+
