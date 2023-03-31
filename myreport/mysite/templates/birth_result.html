@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>八字结果</title>
+</head>
+<body>
+    <h1>八字结果</h1>
+    <h2>命盘</h2>
+    {{ horoscope|safe }}
+    <h2>命理分析</h2>
+    {{ nativityAnalysis|safe }}
+    <br>
+    <a href="{% url 'query' %}">返回查询页面</a>
+</body>
+</html>
