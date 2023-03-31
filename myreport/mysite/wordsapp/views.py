@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 # Create your views here.
-
+import re
 import pyrebase
 from random import randint
 from django.core.mail import send_mail
@@ -9,6 +9,7 @@ from django.core.mail import send_mail
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import auth
+from firebase_admin import db
 
 config = {
     'apiKey': "AIzaSyAj7-2jI9QADY0HSNO9Eh4kEGWnmgWqYQY",
@@ -112,39 +113,47 @@ def signUp(request):
     return render(request, "firebaseRegistration.html")
 
 
-otp = randint(000000, 999999)
+# otp = randint(000000, 999999)
+
+# globalemail = ""
 
 
 def postsignUp(request):
+    # global globalemail
     email = request.POST.get('email')
     passs = request.POST.get('pass')
     name = request.POST.get('name')
-    # try:
-    # otp = randint(000000, 999999)
+    # globalemail = email
+    otp = randint(000000, 999999)
 
-    # msg = Message('OTP', sender='allenkuo0720@gmail.com', recipients=[email])
-    # msg.body = "This is your one-time OTP number:"+str(otp)
-    # mail.send(msg)
+    try:
+        # otp = randint(000000, 999999)
 
-    # return render(request, "verify.html")
+        # msg = Message('OTP', sender='allenkuo0720@gmail.com', recipients=[email])
+        # msg.body = "This is your one-time OTP number:"+str(otp)
+        # mail.send(msg)
 
-    # creating a user with the given email and password
-    user = authe.create_user_with_email_and_password(email, passs)
-    uid = user['localId']
-    # idtoken = request.session['uid']
-    print(uid)
+        # return render(request, "verify.html")
 
-    dict1 = {"email": email}
+        # creating a user with the given email and password
+        user = authe.create_user_with_email_and_password(email, passs)
+        uid = user['localId']
+        # idtoken = request.session['uid']
+        print(uid)
 
-    database.child('Humandata').push(dict1)
+        # dict1 = {"email": email}
+        dict1 = {"otp": otp}
+        # database.child('Humandata').child(email.split('@')[0]).push(dict1)
+        a = email.split('.')
+        database.child('Humandata').child(a[0]).push(dict1)
 
-    message = "This is your one-time OTP number:"+str(otp)
-    send_mail("帳號驗證", message,
-              "allenkuo0720@gmail.com", [email, 'allenkuo0720@gmail.com'])
+        message = "This is your one-time OTP number:"+str(otp)
+        send_mail("帳號驗證", message,
+                  "allenkuo0720@gmail.com", [email, 'allenkuo0720@gmail.com'])
 
-    # except:
-    # message = "本帳號已存在，請確認！！"
-    # return render(request, "firebaseLogin.html", {"message": message})
+    except:
+        message = "本帳號已存在，請確認！！"
+        return render(request, "firebaseLogin.html", {"message": message})
     # except:
     # return render(request, "failure.html")
     # return render(request, "firebaseLogin.html")
@@ -152,6 +161,42 @@ def postsignUp(request):
 
 
 def validate(request):
+    # otp = database.child('Humandata').child(email.split('.')[0]).get().val()
+    # email_id = database.child('Humandata').get().key()
+    import os
+
+    # 获取当前工作目录
+    # current_dir = os.getcwd()
+
+    # 构建 Firebase 金钥的绝对路径
+    # key_path = os.path.join(
+    #     current_dir, 'django-8words-firebase-adminsdk-nok9a-2edc05f7c4.json')
+
+    if not firebase_admin._apps:
+        # 設定 Firebase Admin SDK 的認證憑證
+        cred = credentials.Certificate(
+            r'C:\Users\USER\Desktop\nativityAnalysis\myreport\mysite\django-8words-firebase-adminsdk-nok9a-2edc05f7c4.json')
+        # django-8words-firebase-adminsdk-nok9a-2edc05f7c4
+        firebase_admin.initialize_app(cred, {
+            'databaseURL': 'https://django-8words-default-rtdb.firebaseio.com/'
+        })
+
+    # 取得 Firebase Realtime Database 的根節點
+    ref = db.reference('Humandata')
+
+    # 讀取資料
+    data = ref.get()
+    # print(data)
+    otp = 0
+    for i in data.values():
+        for j in i.values():
+            for k in j.values():
+                otp = k
+                # print(k)
+
+    # otp = database.child('Humandata').child(email).get().val()
+    # for data in datas.each():
+    #     print(data.val())
     user_otp = request.POST.get('otp')
     # return user_otp
     if otp == int(user_otp):
@@ -162,7 +207,7 @@ def validate(request):
 
 
 def birthdaysave(request):
-    email = database.child('Humandata').child('email').get().val()
+    # email = database.child('Humandata').child(globalemail).get().val()
     year = request.POST.get('Year')
     month = request.POST.get('Month')
     day = request.POST.get('Day')
@@ -174,6 +219,7 @@ def birthdaysave(request):
     #     # 設定 Firebase Admin SDK 的認證憑證
     #     cred = credentials.Certificate(
     #         "django-8words-firebase-adminsdk-nok9a-2edc05f7c4.json")
+
     #     firebase_admin.initialize_app(cred, {
     #         'databaseURL': 'https://django-8words-default-rtdb.firebaseio.com'
     #     })
@@ -188,16 +234,21 @@ def birthdaysave(request):
 
     dict2 = {"year": year, "month": month,
              "day": day, "time": time, "gender": gender}
-    database.child('Humandata').child('email').push(dict2)
+    database.child('Humandata').child(email.split(".")[0]).push(dict2)
     # database.child('Humandata').child('Year').push(year)
     # database.child('Humandata').child('Month').push(month)
     # database.child('Humandata').child('Day').push(day)
     # database.child('Humandata').child('Time').push(time)
     # database.child('Humandata').child('Gender').push(gender)
 
-    year = database.child('Humandata').child('Year').get().val()
-    month = database.child('Humandata').child('Month').get().val()
-    day = database.child('Humandata').child('Day').get().val()
-    time = database.child('Humandata').child('Time').get().val()
-    gender = database.child('Humandata').child('Gender').get().val()
+    year = database.child('Humandata').child(
+        email.split('.')[0]).child('Year').get().val()
+    month = database.child('Humandata').child(
+        email.split('.')[0]).child('Month').get().val()
+    day = database.child('Humandata').child(
+        email.split('.')[0]).child('Day').get().val()
+    time = database.child('Humandata').child(
+        email.split('.')[0]).child('Time').get().val()
+    gender = database.child('Humandata').child(
+        email.split('.')[0]).child('Gender').get().val()
     return render(request, "birthdaysave.html", {"year": year, "month": month, "day": day, "time": time, "gender": gender})
