@@ -1,5 +1,7 @@
-from django.shortcuts import render
-
+from django.shortcuts import render , redirect#,徐尉庭增加 redirect
+from django.contrib.auth import update_session_auth_hash#徐尉庭增加
+from django.contrib.auth.forms import PasswordChangeForm#徐尉庭增加
+from .crawler import 生辰八字主業#徐尉庭增加
 # Create your views here.
 
 import pyrebase
@@ -201,31 +203,34 @@ def birthdaysave(request):
     time = database.child('Humandata').child('Time').get().val()
     gender = database.child('Humandata').child('Gender').get().val()
     return render(request, "birthdaysave.html", {"year": year, "month": month, "day": day, "time": time, "gender": gender})
-
-#徐尉庭增加(下面5個def)
-def dashboard(request):
-    return render(request, 'wordsapp/dashboard.html')
-
-def update_profile(request):
-    # 實現更新資料的邏輯
-    return redirect('dashboard')
-
-def change_password(request):
+#以下是徐尉庭增加的
+def 查詢(request):
     if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)
-            return redirect('dashboard')
+        if 'search_horoscope' in request.POST:
+            return redirect('birthday')
+
+    return render(request, '查詢.html')
+
+def birthday(request):
+    if request.method == 'POST':
+        birthdate = request.POST['birthdate']
+        time = request.POST['time']
+        gender = request.POST['gender']
+
+        # 将birthdate分解为Year, Month, Day
+        Year, Month, Day = birthdate.split('-')
+
+        # 调用爬虫函数
+        horoscope, nativityAnalysis = 生辰八字主業(Year, Month, Day, time, gender)
+
+        # 将结果传递给模板
+        context = {
+            'horoscope': horoscope,
+            'nativityAnalysis': nativityAnalysis,
+        }
+        return render(request, 'birth_result.html', context)
     else:
-        form = PasswordChangeForm(request.user)
-    return render(request, 'wordsapp/change_password.html', {'form': form})
+        return render(request, 'birthday.html')
+    #上面為徐尉庭增加
 
-def search_company(request):
-    # 實現查詢公司的邏輯
-    return render(request, 'wordsapp/search_company.html')
-
-def search_horoscope(request):
-    # 實現查詢八字的邏輯，您可以在這裡整合您之前提到的爬蟲程式
-    return render(request, 'wordsapp/search_horoscope.html')
 
