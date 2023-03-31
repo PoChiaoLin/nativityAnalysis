@@ -27,5 +27,8 @@ urlpatterns = [
     path('validate/', views.validate, name='validate'),
     path('birthdaysave/', views.birthdaysave, name='birthdaysave'),
 
-
+    #徐尉庭增加(下面兩行)
+    path('admin/', admin.site.urls),
+    path('', include('wordsapp.urls')),
+    #
 ]

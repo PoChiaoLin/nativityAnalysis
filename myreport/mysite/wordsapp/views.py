@@ -1,5 +1,7 @@
-from django.shortcuts import render
-
+from django.shortcuts import render , redirect#,徐尉庭增加 redirect
+from django.contrib.auth import update_session_auth_hash#徐尉庭增加
+from django.contrib.auth.forms import PasswordChangeForm#徐尉庭增加
+from .crawler import 生辰八字主業#徐尉庭增加
 # Create your views here.
 import re
 import pyrebase
@@ -252,3 +254,34 @@ def birthdaysave(request):
     gender = database.child('Humandata').child(
         email.split('.')[0]).child('Gender').get().val()
     return render(request, "birthdaysave.html", {"year": year, "month": month, "day": day, "time": time, "gender": gender})
+#以下是徐尉庭增加的
+def 查詢(request):
+    if request.method == 'POST':
+        if 'search_horoscope' in request.POST:
+            return redirect('birthday')
+
+    return render(request, '查詢.html')
+
+def birthday(request):
+    if request.method == 'POST':
+        birthdate = request.POST['birthdate']
+        time = request.POST['time']
+        gender = request.POST['gender']
+
+        # 将birthdate分解为Year, Month, Day
+        Year, Month, Day = birthdate.split('-')
+
+        # 调用爬虫函数
+        horoscope, nativityAnalysis = 生辰八字主業(Year, Month, Day, time, gender)
+
+        # 将结果传递给模板
+        context = {
+            'horoscope': horoscope,
+            'nativityAnalysis': nativityAnalysis,
+        }
+        return render(request, 'birth_result.html', context)
+    else:
+        return render(request, 'birthday.html')
+    #上面為徐尉庭增加
+
+
