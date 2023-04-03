@@ -19,17 +19,22 @@ if not firebase_admin._apps:
 
 # 取得 Firebase Realtime Database 的根節點
 ref = db.reference('公司資料')
+ref2 = db.reference('RoeValue累季-1')
 
 # 讀取資料
 datas = ref.get()
 
 # 一層一層抽出股票代號
-for i in datas.keys():
-    print(i)
-    a = datas[i]
-    for j, k in zip(datas[i].keys(), range(2)):
-        print(j)
-        b = a[j] # b['股票代碼']即可得到股票號碼
+for i3 in datas.values():
+    # for j3 in i3.values():
+    for j3, test1 in zip(i3.values(), range(1)):
+        b3 = j3['股票代碼']
+        print(b3)
+        # for i4 in ref2.values():
+        for i4, test2 in zip(i3.values(), range(1)):
+            b4 = ["股票代碼"]
+            # if j3['股票代碼'] == i4["股票代碼"]:
+                
 
 
 
