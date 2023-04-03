@@ -27,8 +27,11 @@ urlpatterns = [
     path('validate/', views.validate, name='validate'),
     path('birthdaysave/', views.birthdaysave, name='birthdaysave'),
 
-    #徐尉庭增加(下面兩行)
-    path('admin/', admin.site.urls),
-    path('', include('wordsapp.urls')),
+    path('查詢/', views.查詢, name='查詢'),
+    path('birthday/', views.birthday, name='birthday'),
+
+    # 徐尉庭增加(下面兩行)
+    # path('admin/', admin.site.urls),
+    # path('', include('wordsapp.urls')),
     #
 ]

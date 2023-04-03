@@ -50,5 +50,19 @@
 	<input type="submit" value="SignUp"><br><br>
 
 </form>
+
+
+<!--加入開始-->
+<script>
+// Fill hidden email field on form submit
+document.getElementById('signup-form').addEventListener('submit', function(event) {
+    var emailInput = document.getElementById('Email');
+    var emailHidden = document.getElementById('email');
+    emailHidden.value = emailInput.value;
+});
+</script>
+<!--加入結束-->
+
+
 </body>
 </html>

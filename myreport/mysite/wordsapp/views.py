@@ -1,7 +1,7 @@
-from django.shortcuts import render , redirect#,徐尉庭增加 redirect
-from django.contrib.auth import update_session_auth_hash#徐尉庭增加
-from django.contrib.auth.forms import PasswordChangeForm#徐尉庭增加
-from .crawler import 生辰八字主業#徐尉庭增加
+from django.shortcuts import render, redirect  # ,徐尉庭增加 redirect
+from django.contrib.auth import update_session_auth_hash  # 徐尉庭增加
+from django.contrib.auth.forms import PasswordChangeForm  # 徐尉庭增加
+from .crawler import 生辰八字主業  # 徐尉庭增加
 # Create your views here.
 import re
 import pyrebase
@@ -14,13 +14,21 @@ from firebase_admin import auth
 from firebase_admin import db
 
 config = {
-    'apiKey': "AIzaSyAj7-2jI9QADY0HSNO9Eh4kEGWnmgWqYQY",
-    'authDomain': "django-8words.firebaseapp.com",
-    'databaseURL': "https://django-8words-default-rtdb.firebaseio.com",
-    'projectId': "django-8words",
-    'storageBucket': "django-8words.appspot.com",
-    'messagingSenderId': "367449997168",
-    'appId': "1:367449997168:web:96edec47ab472ed7a359b5",
+    'apiKey': "AIzaSyD34Ag5lIY3rqWx-JxxpnlRWHFH89Yz_Fw",
+    'authDomain': "django-8words-2c6a1.firebaseapp.com",
+    'databaseURL': "https://django-8words-2c6a1-default-rtdb.firebaseio.com",
+    'projectId': "django-8words-2c6a1",
+    'storageBucket': "django-8words-2c6a1.appspot.com",
+    'messagingSenderId': "214881135592",
+    'appId': "1:214881135592:web:933d120422cab3dd13925d",
+
+    # 'apiKey': "AIzaSyAj7-2jI9QADY0HSNO9Eh4kEGWnmgWqYQY",
+    # 'authDomain': "django-8words.firebaseapp.com",
+    # 'databaseURL': "https://django-8words-default-rtdb.firebaseio.com",
+    # 'projectId': "django-8words",
+    # 'storageBucket': "django-8words.appspot.com",
+    # 'messagingSenderId': "367449997168",
+    # 'appId': "1:367449997168:web:96edec47ab472ed7a359b5",
 
 }
 
@@ -144,14 +152,16 @@ def postsignUp(request):
         print(uid)
 
         # dict1 = {"email": email}
-        dict1 = {"otp": otp}
+        dict1 = {"otp": otp, "email": email}
         # database.child('Humandata').child(email.split('@')[0]).push(dict1)
         a = email.split('.')
         database.child('Humandata').child(a[0]).push(dict1)
 
         message = "This is your one-time OTP number:"+str(otp)
         send_mail("帳號驗證", message,
-                  "allenkuo0720@gmail.com", [email, 'allenkuo0720@gmail.com'])
+                  "allenkuo07201@gmail.com", [email, 'allenkuo07201@gmail.com'])
+
+        # context = {"email": email}
 
     except:
         message = "本帳號已存在，請確認！！"
@@ -174,13 +184,17 @@ def validate(request):
     # key_path = os.path.join(
     #     current_dir, 'django-8words-firebase-adminsdk-nok9a-2edc05f7c4.json')
 
+    # email = request.POST.get('email')
+    # context = {"email": email}
+    # a = email.split('.')
+
     if not firebase_admin._apps:
         # 設定 Firebase Admin SDK 的認證憑證
         cred = credentials.Certificate(
-            r'C:\Users\USER\Desktop\nativityAnalysis\myreport\mysite\django-8words-firebase-adminsdk-nok9a-2edc05f7c4.json')
+            'django-8words-2c6a1-firebase-adminsdk-usxvz-3e2e8a279e.json')
         # django-8words-firebase-adminsdk-nok9a-2edc05f7c4
         firebase_admin.initialize_app(cred, {
-            'databaseURL': 'https://django-8words-default-rtdb.firebaseio.com/'
+            'databaseURL': 'https://django-8words-2c6a1-default-rtdb.firebaseio.com/'
         })
 
     # 取得 Firebase Realtime Database 的根節點
@@ -189,32 +203,42 @@ def validate(request):
     # 讀取資料
     data = ref.get()
     # print(data)
+    email = 0
     otp = 0
     for i in data.values():
         for j in i.values():
             for k in j.values():
-                otp = k
+                # 這裡要加判斷式len(k)<7就是otp
+                otp = int(k)
                 # print(k)
 
     # otp = database.child('Humandata').child(email).get().val()
     # for data in datas.each():
     #     print(data.val())
     user_otp = request.POST.get('otp')
+    temp_otp = int(user_otp)
     # return user_otp
-    if otp == int(user_otp):
+    if otp == temp_otp:
         return render(request, "birthday.html")
     # return render(request, "success.html")
-    else:
+    else:  # 加入刪除帳戶的程式碼
+        # user.delete()
         return render(request, "firebaseRegistration.html")
 
 
-def birthdaysave(request):
+def birthdaysave(request):  # 待改
     # email = database.child('Humandata').child(globalemail).get().val()
-    year = request.POST.get('Year')
-    month = request.POST.get('Month')
-    day = request.POST.get('Day')
-    time = request.POST.get('Time')
-    gender = request.POST.get('Gender')
+    born = request.POST.get('birthdate')
+    born_split = born.split('-')
+    year = born_split[0]
+    month = born_split[1]
+    day = born_split[2]
+
+    # year = request.POST.get('Year')
+    # month = request.POST.get('Month')
+    # day = request.POST.get('Day')
+    time = request.POST.get('time')
+    gender = request.POST.get('gender')
 
     # # 檢查 Firebase Admin SDK 是否已經初始化
     # if not firebase_admin._apps:
@@ -234,33 +258,45 @@ def birthdaysave(request):
     # email = user.email
     # print(email)
 
+    # 取得 Firebase Realtime Database 的根節點
+    ref = db.reference('Humandata')
+
+    # 讀取資料
+    data = ref.get()
+
+    id = 0
+    for u in data.keys():
+        id = u
+        # print(u)
+
     dict2 = {"year": year, "month": month,
              "day": day, "time": time, "gender": gender}
-    database.child('Humandata').child(email.split(".")[0]).push(dict2)
+    database.child('Humandata').child(id).set(dict2)
     # database.child('Humandata').child('Year').push(year)
     # database.child('Humandata').child('Month').push(month)
     # database.child('Humandata').child('Day').push(day)
     # database.child('Humandata').child('Time').push(time)
     # database.child('Humandata').child('Gender').push(gender)
 
-    year = database.child('Humandata').child(
-        email.split('.')[0]).child('Year').get().val()
-    month = database.child('Humandata').child(
-        email.split('.')[0]).child('Month').get().val()
-    day = database.child('Humandata').child(
-        email.split('.')[0]).child('Day').get().val()
-    time = database.child('Humandata').child(
-        email.split('.')[0]).child('Time').get().val()
-    gender = database.child('Humandata').child(
-        email.split('.')[0]).child('Gender').get().val()
+    # year = database.child('Humandata').child(
+    #     email.split('.')[0]).child('Year').get().val()
+
+    year = database.child('Humandata').child(id).child('year').get().val()
+    month = database.child('Humandata').child(id).child('month').get().val()
+    day = database.child('Humandata').child(id).child('day').get().val()
+    time = database.child('Humandata').child(id).child('time').get().val()
+    gender = database.child('Humandata').child(id).child('gender').get().val()
     return render(request, "birthdaysave.html", {"year": year, "month": month, "day": day, "time": time, "gender": gender})
-#以下是徐尉庭增加的
+# 以下是徐尉庭增加的
+
+
 def 查詢(request):
     if request.method == 'POST':
         if 'search_horoscope' in request.POST:
             return redirect('birthday')
 
     return render(request, '查詢.html')
+
 
 def birthday(request):
     if request.method == 'POST':
@@ -282,6 +318,4 @@ def birthday(request):
         return render(request, 'birth_result.html', context)
     else:
         return render(request, 'birthday.html')
-    #上面為徐尉庭增加
-
-
+    # 上面為徐尉庭增加

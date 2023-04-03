@@ -45,17 +45,17 @@ INSTALLED_APPS = [
 # email配置
 EMAIL_HOST = "smtp.gmail.com"
 
-EMAIL_HOST_USER = "allenkuo0720"
+EMAIL_HOST_USER = "allenkuo07201"
 
-EMAIL_HOST_PASSWORD = "edxlmjwxoxfwxwop"
+EMAIL_HOST_PASSWORD = "rfmfedkviasfrstc"
 
 EMAIL_PORT = "465"
 
 EMAIL_USE_SSL = "True"
 
-ADMINS = (('allenkuo0720', 'allenkuo0720@gmail.com'),)
+ADMINS = (('allenkuo07201', 'allenkuo07201@gmail.com'),)
 
-MANAGERS = (('allenkuo0720', 'allenkuo0720@gmail.com'),)
+MANAGERS = (('allenkuo07201', 'allenkuo07201@gmail.com'),)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

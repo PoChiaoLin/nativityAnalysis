@@ -2,7 +2,13 @@
 <head>  
     <title>OTP Verification</title>  
 </head>  
-    <body>  
+    <body> 
+
+    <!--加入開始-->
+    <input type="hidden" name="email" value="{{ email }}">
+    email = request.POST.get('email') 
+    <!--加入結束-->
+
       <form action = {% url 'validate' %} method="post">
             {% csrf_token %}
         <h4> OTP has been sent to the email id. Please check the email for the confirmation.</h4>  
