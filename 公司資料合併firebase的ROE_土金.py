@@ -50,6 +50,7 @@ datas = ref.get()
 datas2 = ref2.get()
 x = ["土", "金"]
 # 一層一層抽出股票代號
+
 for i3 in x:
     for j3 in datas[i3].keys():
         b3 = int(datas[i3][j3]['股票代碼'])

@@ -169,7 +169,7 @@ def postsignUp(request):
     # except:
     # return render(request, "failure.html")
     # return render(request, "firebaseLogin.html")
-    return render(request, "verify.html")
+    return render(request, "verify.html", {"a_temp" : a})
 
 
 def validate(request):
