@@ -159,21 +159,21 @@ if not firebase_admin._apps:
 
 
 #----------------------------多工設計
-def process_data(z, b, datas2):
+def process_data(z, datas2):
     data1 = {}
-    data1["股票代碼"] = b
+    data1["股票代碼"] = z
     try:
-        period, roeVaule = getComData(int(b))
+        period, roeVaule = getComData(int(z))
         for y in range(len(period)):
             if len(period[y]) == len(roeVaule[y]):
                 for x in range(len(period[y])):
                     data1[str(period[y][x])] = str(roeVaule[y][x])
             else:
-                print("{}資料不匹配".format(b))
+                print("{}資料不匹配".format(z))
         database.child('RoeValue累季-test').push(data1)
         rorToCom(datas2, data1)
     except:
-        print("{}未成功上傳".format(b))
+        print("{}未成功上傳".format(z))
         return
 
 ref = db.reference('ROE缺漏')
@@ -187,8 +187,8 @@ for i in datas.keys():
 b = set(a)
 
 threads = []
-for z in datas.keys():
-    threads.append(threading.Thread(target=process_data, args=(z, b, datas2)))
+for z in b:
+    threads.append(threading.Thread(target=process_data, args=(z, datas2)))
     threads[-1].start()
 
 # 等待所有執行緒都結束
