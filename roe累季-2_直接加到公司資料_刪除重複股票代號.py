@@ -64,7 +64,7 @@ def getComData(comNo):
             soup = BeautifulSoup(browser.page_source,"html.parser")
         except:
             print("{}網頁異常".format(comNo))
-            database.child("網頁異常").push(comNo)
+            database.child("網頁異常2").push(comNo)
             return qFinal, roeFinal
         try:
             main = soup.select_one("table.b1.p4_4.r0_10.row_mouse_over")
@@ -116,7 +116,7 @@ def rorToCom(data, roedata):
                             print(datas[i3][j3]['股票代碼'])
                     else:
                         data4 = {"股票代碼": b3}
-                        database.child('ROE缺漏2-test').push(data4)
+                        database.child('ROE缺漏2').push(data4)
                         # print(b3, "抓不到")
                         continue
         return
@@ -133,64 +133,35 @@ if not firebase_admin._apps:
         'databaseURL': 'https://test1-bfab0-default-rtdb.firebaseio.com/'
     })
 
-# ref = db.reference('ROE缺漏')
-# ref2 = db.reference('公司資料')
-# datas = ref.get()
-# datas2 = ref2.get()
+ref = db.reference('ROE缺漏')
+ref2 = db.reference('公司資料')
+datas = ref.get()
+datas2 = ref2.get()
+a = []
+count = 0
+for i in datas.keys():
+    a.append(datas[i]["股票代碼"])  
+b = set(a)
+c = list(b)
 
-# for z in datas.keys():
-#     datas[z]["股票代碼"]
-#     period, roeVaule = getComData(int(datas[z]["股票代碼"]))
-#     data1 = {}
-#     data1["股票代碼"] = datas[z]["股票代碼"]
-#     try:
-#         for y in range(len(period)):
-#             if len(period[y]) == len(roeVaule[y]):
-#                 for x in range(len(period[y])):
-#                     data1[str(period[y][x])] = str(roeVaule[y][x])
-#             else:
-#                 print("{}資料不匹配".format(datas[z]["股票代碼"]))
-#         database.child('RoeValue累季-2').push(data1)
-#         rorToCom(datas2, data1)
-#     except:
-#         print("{}未成功上傳".format(datas[z]["股票代碼"]) )
-#         continue
-# print("上傳完畢")
-
-
-#----------------------------多工設計
-def process_data(z, datas, datas2):
+for z in c:
+    period, roeVaule = getComData(int(z))
     data1 = {}
-    data1["股票代碼"] = datas[z]["股票代碼"]
+    data1["股票代碼"] = z
     try:
-        period, roeVaule = getComData(int(datas[z]["股票代碼"]))
         for y in range(len(period)):
             if len(period[y]) == len(roeVaule[y]):
                 for x in range(len(period[y])):
                     data1[str(period[y][x])] = str(roeVaule[y][x])
             else:
-                print("{}資料不匹配".format(datas[z]["股票代碼"]))
-        database.child('RoeValue累季-test').push(data1)
+                print("{}資料不匹配".format(z))
+        database.child('RoeValue累季-2').push(data1)
         rorToCom(datas2, data1)
     except:
-        print("{}未成功上傳".format(datas[z]["股票代碼"]))
-        return
-
-ref = db.reference('ROE缺漏')
-ref2 = db.reference('公司資料')
-datas = ref.get()
-datas2 = ref2.get()
-
-threads = []
-for z in datas.keys():
-    threads.append(threading.Thread(target=process_data, args=(z, datas, datas2)))
-    threads[-1].start()
-
-# 等待所有執行緒都結束
-for t in threads:
-    t.join()
-
+        print("{}未成功上傳".format(z) )
+        continue
 print("上傳完畢")
+
 
 
 
