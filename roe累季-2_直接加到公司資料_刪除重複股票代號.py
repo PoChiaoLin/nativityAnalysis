@@ -144,7 +144,7 @@ for i in datas.keys():
 b = set(a)
 c = list(b)
 
-for z in c:
+for z in c[0: 100]:
     period, roeVaule = getComData(int(z))
     data1 = {}
     data1["股票代碼"] = z

@@ -127,49 +127,81 @@ def signUp(request):
 
 # globalemail = ""
 
+def otpVerify(email, passs, request):
+    otp = randint(000000, 999999)
+    try:
+        user = authe.create_user_with_email_and_password(email, passs)
+        uid = user['localId']
+        dict1 = {"otp": otp, "email": email}
+        a = email.split('.')
+        database.child('Humandata').child(a[0]).push(dict1)
+        database.child("email_t").push(a[0])
+        ref = db.reference('email_t')
+        datas = ref.get()
+        for b in datas.keys():
+            if datas[b] == a[0]:
+                value = datas[b]
+                ref.child(value).set(value)
+                ref.child(b).delete()
+        ref = db.reference('email_t')
+        datas = ref.get()
+        for b in datas.keys():
+            if datas[b] == a[0]:
+                value = datas[b]
+                ref.child(value).set(value)
+                ref.child(b).delete()
+        message = "This is your one-time OTP number:"+str(otp)
+        send_mail("帳號驗證", message,
+                  "allenkuo07201@gmail.com", [email, 'allenkuo07201@gmail.com'])
+    except:
+        message = "本帳號已存在，請確認！！"
+        return render(request, "firebaseLogin.html", {"message": message})
+    return render(request, "verify.html")
+
 
 def postsignUp(request):
     # global globalemail
     email = request.POST.get('email')
     passs = request.POST.get('pass')
     name = request.POST.get('name')
+    otpVerify(email, passs)
     # globalemail = email
     otp = randint(000000, 999999)
 
-    try:
-        # otp = randint(000000, 999999)
+    # try:
+    # otp = randint(000000, 999999)
 
-        # msg = Message('OTP', sender='allenkuo0720@gmail.com', recipients=[email])
-        # msg.body = "This is your one-time OTP number:"+str(otp)
-        # mail.send(msg)
+    # msg = Message('OTP', sender='allenkuo0720@gmail.com', recipients=[email])
+    # msg.body = "This is your one-time OTP number:"+str(otp)
+    # mail.send(msg)
 
-        # return render(request, "verify.html")
+    # return render(request, "verify.html")
 
-        # creating a user with the given email and password
-        user = authe.create_user_with_email_and_password(email, passs)
-        uid = user['localId']
-        # idtoken = request.session['uid']
-        print(uid)
+    # creating a user with the given email and password
+    #user = authe.create_user_with_email_and_password(email, passs)
+    #uid = user['localId']
+    # idtoken = request.session['uid']
+    # print(uid)
 
-        # dict1 = {"email": email}
-        dict1 = {"otp": otp, "email": email}
-        # database.child('Humandata').child(email.split('@')[0]).push(dict1)
-        a = email.split('.')
-        database.child('Humandata').child(a[0]).push(dict1)
+    # dict1 = {"email": email}
+    #dict1 = {"otp": otp, "email": email}
+    # database.child('Humandata').child(email.split('@')[0]).push(dict1)
+    #a = email.split('.')
+    # database.child('Humandata').child(a[0]).push(dict1)
 
-        message = "This is your one-time OTP number:"+str(otp)
-        send_mail("帳號驗證", message,
-                  "allenkuo07201@gmail.com", [email, 'allenkuo07201@gmail.com'])
+    #message = "This is your one-time OTP number:"+str(otp)
+    # send_mail("帳號驗證", message,
+    # "allenkuo07201@gmail.com", [email, 'allenkuo07201@gmail.com'])
 
-        # context = {"email": email}
+    # context = {"email": email}
 
-    except:
-        message = "本帳號已存在，請確認！！"
-        return render(request, "firebaseLogin.html", {"message": message})
+    # except:
+    #message = "本帳號已存在，請確認！！"
+    # return render(request, "firebaseLogin.html", {"message": message})
     # except:
     # return render(request, "failure.html")
     # return render(request, "firebaseLogin.html")
-    return render(request, "verify.html")
+    # return render(request, "verify.html")
 
 
 def validate(request):
@@ -216,6 +248,7 @@ def validate(request):
     # for data in datas.each():
     #     print(data.val())
     user_otp = request.POST.get('otp')
+
     temp_otp = int(user_otp)
     # return user_otp
     if otp == temp_otp:

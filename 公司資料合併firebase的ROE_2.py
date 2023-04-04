@@ -43,7 +43,7 @@ database = firebase.database()
 
 # 取得 Firebase Realtime Database 的根節點
 ref = db.reference('公司資料')
-ref2 = db.reference('RoeValue累季')
+ref2 = db.reference('RoeValue累季-2')
 
 # 讀取資料
 datas = ref.get()
@@ -55,11 +55,11 @@ for i3 in datas.keys():
         b3 = int(datas[i3][j3]['股票代碼'])
         # for i4 in ref2.values():
         if len(datas[i3][j3]) > 4:
-            print(b3, "不用抓")
+            # print(b3, "不用抓")
             continue
         else:
             for i4 in datas2.values():
-                if datas[i3][j3]['股票代碼'] == i4["股票代碼"]:
+                if int(datas[i3][j3]['股票代碼']) == i4["股票代碼"]:
                     ref = db.reference("公司資料/{}/{}".format(i3, j3))
                     if "Q" not in ref.get():
                         ref.update(i4)

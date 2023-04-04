@@ -137,27 +137,6 @@ def aiModel(a):
         # 建立線性回歸模型
         model = LinearRegression()
         model.fit(np.array(X).reshape(-1, 1), np.array(y))
-    
-        # # 輸出模型係數
-        # print("模型係數：", model.coef_)
-        # print("截距：", model.intercept_)
-        # # 繪製模型圖表
-        # x_range = np.array([min(X), max(X)])
-        # y_range = model.predict(x_range.reshape(-1, 1))
-        # plt.plot(x_range, y_range, color='red')
-    
-        # # 繪製散佈圖
-        # plt.scatter(X, y)
-    
-        # # 設定圖表標題與座標軸標籤
-        # plt.title('Linear Regression Model')
-        # plt.xlabel('Quarter')
-        # plt.ylabel('Value')
-    
-        # # 顯示圖表
-        # plt.show()
-    
-    # 預測下一個季度的值
     next_quarter = len(quarters)
     next_value = model.predict([[next_quarter]])[0]
     print("預測值為：{:.2f}".format(next_value))
@@ -186,39 +165,44 @@ def aiModel(a):
     # 計算成功率
     success_rate = (len(values) - len(outliers)) / len(values) * 100
     print("成功率：", "{:.2f}".format(success_rate)+"%")
-    return next_value
+    return next_value, success_rate
 
 # # 讀取資料---------------------------------------------------------------
-# ref = db.reference('公司資料')
-# datas = ref.get()
+ref = db.reference('公司資料')
+datas = ref.get()
 
 #測試用datas
-datas =  {"土":{'-NRaNeqJxyftzsjv5NTl': {'2018Q4': '-75.05', '2019Q1': '-26.99', '2019Q2': '-44.74', '2019Q3': '-70.79', '2019Q4': '-165', '2020Q1': '-143.2', '2020Q2': '-335', '2020Q3': '-137.6', '2020Q4': '-155.4', '2021Q1': '-6.66', '2021Q2': '-18.61', '2021Q3': '19.35', '2021Q4': '19.72', '2022Q1': '-7.51', '2022Q2': '-11.64', '2022Q3': '-10.98', '股票代碼': '3085'}}}
+# datas =  {"土":{'-NRaNeqJxyftzsjv5NTl': {'2018Q4': '-75.05', '2019Q1': '-26.99', '2019Q2': '-44.74', '2019Q3': '-70.79', '2019Q4': '-165', '2020Q1': '-143.2', '2020Q2': '-335', '2020Q3': '-137.6', '2020Q4': '-155.4', '2021Q1': '-6.66', '2021Q2': '-18.61', '2021Q3': '19.35', '2021Q4': '19.72', '2022Q1': '-7.51', '2022Q2': '-11.64', '2022Q3': '-10.98', '股票代碼': '3085'}}}
 
 # a = []
 # b = []
 for i3 in datas.keys():
     for j3 in datas[i3].keys():
-        i = int(datas[i3][j3])
-        roeS = roeSvalue(i)
-        newDatas, newDatasQ4 = roeDataSortOut(roeS)
-        dataDict = {"股票代碼": datas[i3][j3]["股票代碼"],
-                    "公司名稱": datas[i3][j3]["公司名稱"],
-                    "所屬產業": datas[i3][j3]["所屬產業"],
-                    "屬性": i3,
-                    "New_ROE": "",
-                    "Next_ROE": "",
-                    "statuses": "",}
-        avgRoe, roeNew = roeAVG(newDatas) #ROE中位數平均值, 最新的ROE值
-        dataDict["New_ROE"] = roeNew
-        if roeNew < avgRoe:
-            dataDict["statuses"] = "差於中位數平均值"
+    # for j3, a3 in zip(datas[i3].keys(), range(1)): # 測試用
+        if len(datas[i3][j3].values()) > 6:
+            roeS = roeSvalue(datas[i3][j3])
+            newDatas, newDatasQ4 = roeDataSortOut(roeS)
+            dataDict = {"股票代碼": datas[i3][j3]["股票代碼"],
+                        "公司名稱": datas[i3][j3]["公司名稱"],
+                        "所屬產業": datas[i3][j3]["所屬產業"],
+                        "屬性": i3,
+                        "New_ROE": "",
+                        "Next_ROE": "",
+                        "statuses": "",
+                        "SuccessRate": "",}
+            avgRoe, roeNew = roeAVG(newDatas) #ROE中位數平均值, 最新的ROE值
+            dataDict["New_ROE"] = roeNew
+            if roeNew < avgRoe:
+                dataDict["statuses"] = "差於中位數平均值"
+            else:
+                dataDict["statuses"] = "優於中位數平均值"
+            for temp1 in newDatas.values(): 
+                nextValue, success_rate = aiModel(temp1) # ROE預測值, 成功率
+                dataDict["Next_ROE"] = nextValue
+                dataDict["SuccessRate"] = success_rate
+            database.child('完整公司資料-1').push(dataDict)
         else:
-            dataDict["statuses"] = "優於中位數平均值"
-        for temp1 in newDatas.values(): 
-            nextValue = aiModel(temp1) # ROE預測值
-            dataDict["Next_ROE"] = nextValue
-        database.child('完整公司資料').push(dataDict)
+            continue
     
     # a.append(newDatas)
     # b.append(newDatasQ4)
