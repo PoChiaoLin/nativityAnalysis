@@ -16,21 +16,32 @@ from django.http import HttpResponse
 
 
 config = {
-  'apiKey': "AIzaSyCE-vHKK0MNrCcy-KAtK__0HW9hrRXM_M4",
-  'authDomain': "test1-bfab0.firebaseapp.com",
-  'projectId': "test1-bfab0",
-  'storageBucket': "test1-bfab0.appspot.com",
-  'messagingSenderId': "863152004967",
-  'appId': "1:863152004967:web:85cd44c032569b84d799c2",
-  'measurementId': "G-8ED4G9L00T",
-  #URL 路徑為資料庫網址
-  'databaseURL': "https://test1-bfab0-default-rtdb.firebaseio.com",}
+    'apiKey': "AIzaSyD34Ag5lIY3rqWx-JxxpnlRWHFH89Yz_Fw",
+    'authDomain': "django-8words-2c6a1.firebaseapp.com",
+    'databaseURL': "https://django-8words-2c6a1-default-rtdb.firebaseio.com",
+    'projectId': "django-8words-2c6a1",
+    'storageBucket': "django-8words-2c6a1.appspot.com",
+    'messagingSenderId': "214881135592",
+    'appId': "1:214881135592:web:933d120422cab3dd13925d",
+
+
+    #   'apiKey': "AIzaSyCE-vHKK0MNrCcy-KAtK__0HW9hrRXM_M4",
+    #   'authDomain': "test1-bfab0.firebaseapp.com",
+    #   'projectId': "test1-bfab0",
+    #   'storageBucket': "test1-bfab0.appspot.com",
+    #   'messagingSenderId': "863152004967",
+    #   'appId': "1:863152004967:web:85cd44c032569b84d799c2",
+    #   'measurementId': "G-8ED4G9L00T",
+    #   #URL 路徑為資料庫網址
+    #   'databaseURL': "https://test1-bfab0-default-rtdb.firebaseio.com",
+}
 if not firebase_admin._apps:
-            # 設定 Firebase Admin SDK 的認證憑證
-            cred = credentials.Certificate("C:\Bob\\nativityAnalysis\\myreport\mysite\\static\\test1-bfab0-firebase-adminsdk-1gtyi-b1c5698522.json")
-            firebase_admin.initialize_app(cred, {
-            'databaseURL': 'https://test1-bfab0-default-rtdb.firebaseio.com/'
-            })
+    # 設定 Firebase Admin SDK 的認證憑證
+    cred = credentials.Certificate(
+        "django-8words-2c6a1-firebase-adminsdk-usxvz-3e2e8a279e.json")
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': 'https://django-8words-2c6a1-default-rtdb.firebaseio.com/'
+    })
 
 firebase = pyrebase.initialize_app(config)
 database = firebase.database()
@@ -96,12 +107,15 @@ def signIn(request):
 def home(request):
     return render(request, "firebaseHome.html")
 
+
 def inquire(request):
     if request.method == 'POST':
         if 'search_horoscope' in request.POST:
             return redirect('birthday')
 
     return render(request, 'inquire.html')
+
+
 def postsignIn(request):
     email = request.POST.get('email')
     pasw = request.POST.get('pass')
@@ -115,7 +129,6 @@ def postsignIn(request):
         return render(request, "firebaseLogin.html", {"message": message})
     session_id = user['idToken']
     request.session['uid'] = str(session_id)
-    return render(request, "inquire.html", {"email": email_t})
     return render(request, "firebaseHome.html", {"email": email_t})
 
 
@@ -161,7 +174,7 @@ def postsignUp(request):
 
 def validate(request):
     email_t = request.POST.get('email')
-    #return HttpResponse("{}".format(email_t))
+    # return HttpResponse("{}".format(email_t))
     user_otp = request.POST.get('otp')
     ref = db.reference('Humandata')
 
@@ -169,23 +182,24 @@ def validate(request):
     data = ref.get()
     for m_t in data.keys():
         if m_t == email_t:
-            #return HttpResponse("成功")
+            # return HttpResponse("成功")
             for d_t in data[email_t].keys():
-                    otp = int(data[email_t][d_t]["otp"])
-                    temp_otp = int(user_otp)
-                    if otp == temp_otp:
-                        return render(request, "birthday.html", {"email": email_t})
-                    else:  # 加入刪除帳戶的程式碼
-                        # user.delete()
-                        return HttpResponse("OTP不正確，請重新輸入")
-            
+                otp = int(data[email_t][d_t]["otp"])
+                temp_otp = int(user_otp)
+                if otp == temp_otp:
+                    return render(request, "birthday.html", {"email": email_t})
+                else:  # 加入刪除帳戶的程式碼
+                    # user.delete()
+                    return HttpResponse("OTP不正確，請重新輸入")
+
         else:
             continue
+
 
 def words82(request):
     email_t = request.POST.get('email')
     ref = db.reference('Humandata/{}'.format(email_t))
-    #database.child('Humandata').child(email_t)
+    # database.child('Humandata').child(email_t)
     data = ref.get()
     Year = data["Humandata"][email_t]["year"]
     Month = data["Humandata"][email_t]["month"]
@@ -194,6 +208,7 @@ def words82(request):
     sex = data["Humandata"][email_t]["gender"]
     horoscope, nativityAnaly, godOfJoy = words8(Year, Month, Day, Hour, sex)
     return render(request, "birthday_result.html", {"email": email_t})
+
 
 def words8(Year, Month, Day, Hour, sex):
     import re
@@ -251,10 +266,10 @@ def words8(Year, Month, Day, Hour, sex):
         for i in tmepGod:
             godOfJoy.append(i)
 
-        return horoscope, nativityAnalysis, godOfJoy            
+        return horoscope, nativityAnalysis, godOfJoy
 
 
-def birthdaysave(request):  # 待改
+def birthdaysave(request):
     # email = database.child('Humandata').child(globalemail).get().val()
     email_t = request.POST.get('email')
     born = request.POST.get('birthdate')
@@ -264,9 +279,10 @@ def birthdaysave(request):  # 待改
     day = born_split[2]
     time = request.POST.get('time')
     gender = request.POST.get('gender')
-    horoscope, nativityAnalysis, godOfJoy = words8(year, month, day, time, gender)
+    horoscope, nativityAnalysis, godOfJoy = words8(
+        year, month, day, time, gender)
     godOfJoy_t = str(godOfJoy)
-    #return HttpResponse("{}+{}".format(godOfJoy_t, godOfJoy))
+    # return HttpResponse("{}+{}".format(godOfJoy_t, godOfJoy))
     dict2 = {"year": year, "month": month,
              "day": day, "time": time, "gender": gender, "godOfJoy": godOfJoy_t}
     database.child('Humandata').child(email_t).set(email_t)
@@ -274,7 +290,30 @@ def birthdaysave(request):  # 待改
     return render(request, "firebaseLogin.html")
 
 
+def modifydatas(request):
+    email_t = request.POST.get('email')
+    born = request.POST.get('birthdate')
+    born_split = born.split('-')
+    year = born_split[0]
+    month = born_split[1]
+    day = born_split[2]
+    time = request.POST.get('time')
+    gender = request.POST.get('gender')
+    horoscope, nativityAnalysis, godOfJoy = words8(
+        year, month, day, time, gender)
+    godOfJoy_t = str(godOfJoy)
+    dict2 = {"year": year, "month": month,
+             "day": day, "time": time, "gender": gender, "godOfJoy": godOfJoy_t}
+    database.child('Humandata').child(email_t).update(dict2)
+    return render(request, "firebaseLogin.html", {"email": email_t})
 
 
-
-
+def postReset(request):
+    email = request.POST.get('email')
+    try:
+        authe.send_password_reset_email(email)
+        message = "A email to reset password is succesfully sent"
+        return render(request, "firebaseReset.html", {"msg": message})
+    except:
+        message = "Something went wrong, Please check the email you provided is registered or not"
+        return render(request, "firebaseReset.html", {"msg": message})

@@ -28,6 +28,10 @@ urlpatterns = [
     path('birthdaysave/', views.birthdaysave, name='birthdaysave'),
     path('words82/', views.words82, name='words82'),
     path('inquire/', views.inquire, name='inquire'),
+    path('modifydatas/', views.modifydatas, name='modifydatas'),
+    path('postReset/', views.postReset, name='postReset'),
+
+
 
     # 徐尉庭增加(下面兩行)
     # path('admin/', admin.site.urls),
