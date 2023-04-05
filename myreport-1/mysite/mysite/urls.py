@@ -26,8 +26,9 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),
     path('validate/', views.validate, name='validate'),
     path('birthdaysave/', views.birthdaysave, name='birthdaysave'),
-    path('words82/', views.words82, name='words82'),
-    path('inquire/', views.inquire, name='inquire'),
+
+    path('查詢/', views.查詢, name='查詢'),
+    path('birthday/', views.birthday, name='birthday'),
 
     # 徐尉庭增加(下面兩行)
     # path('admin/', admin.site.urls),

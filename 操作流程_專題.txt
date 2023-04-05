@@ -1,0 +1,18 @@
+1. http://127.0.0.1:8000 
+2. 直接呼叫def signIn(request):
+    return render(request, "firebaseLogin.html")
+3. 顯示firebaseLogin.html
+4. 註冊: 點Sign Up: <button type="button" onclick="location.href='/signUp/ '">SignUp</button>
+5. onclick="location.href='/signUp/ 呼叫def signUp(request):
+    return render(request, "firebaseRegistration.html")
+6. 顯示firebaseRegistration.html
+7. 點擊 sign up: <input type="submit" value="SignUp"> 
+    使用firebaseRegistration.html<form action={% url 'postsignUp' %} method="post">
+    呼叫 def postsignUp(request):
+8. return render(request, "birthday.html") 
+9. 顯示birthday.html
+10. <form action={% url 'birthdaysave' %} method="post"> 呼叫def birthdaysave(request)
+11. 再呼叫def words8(Year, Month, Day, Hour, sex)抓喜用神, 存進firebase.
+12. 回到登入firebaseLogin.html.
+13. 
+

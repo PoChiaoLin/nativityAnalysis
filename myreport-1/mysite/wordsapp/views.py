@@ -96,17 +96,10 @@ def signIn(request):
 def home(request):
     return render(request, "firebaseHome.html")
 
-def inquire(request):
-    if request.method == 'POST':
-        if 'search_horoscope' in request.POST:
-            return redirect('birthday')
 
-    return render(request, 'inquire.html')
 def postsignIn(request):
     email = request.POST.get('email')
     pasw = request.POST.get('pass')
-    a = email.split(".")
-    email_t = a[0]
     try:
         # if there is no error then signin the user with given email and password
         user = authe.sign_in_with_email_and_password(email, pasw)
@@ -115,8 +108,7 @@ def postsignIn(request):
         return render(request, "firebaseLogin.html", {"message": message})
     session_id = user['idToken']
     request.session['uid'] = str(session_id)
-    return render(request, "inquire.html", {"email": email_t})
-    return render(request, "firebaseHome.html", {"email": email_t})
+    return render(request, "firebaseHome.html", {"email": email})
 
 
 def logout(request):
@@ -134,7 +126,6 @@ def signUp(request):
 # otp = randint(000000, 999999)
 
 # globalemail = ""
-
 
 def postsignUp(request):
     # global globalemail
@@ -164,117 +155,115 @@ def validate(request):
     #return HttpResponse("{}".format(email_t))
     user_otp = request.POST.get('otp')
     ref = db.reference('Humandata')
-
-    # 讀取資料
     data = ref.get()
     for m_t in data.keys():
         if m_t == email_t:
             #return HttpResponse("成功")
             for d_t in data[email_t].keys():
                     otp = int(data[email_t][d_t]["otp"])
+                     {mo8888@: {dhfjsfj: { otp: 111, email: eeee}}}
                     temp_otp = int(user_otp)
                     if otp == temp_otp:
-                        return render(request, "birthday.html", {"email": email_t})
+                        return render(request, "birthday.html")
                     else:  # 加入刪除帳戶的程式碼
                         # user.delete()
                         return HttpResponse("OTP不正確，請重新輸入")
             
         else:
             continue
-
-def words82(request):
-    email_t = request.POST.get('email')
-    ref = db.reference('Humandata/{}'.format(email_t))
-    #database.child('Humandata').child(email_t)
-    data = ref.get()
-    Year = data["Humandata"][email_t]["year"]
-    Month = data["Humandata"][email_t]["month"]
-    Day = data["Humandata"][email_t]["day"]
-    Hour = data["Humandata"][email_t]["time"]
-    sex = data["Humandata"][email_t]["gender"]
-    horoscope, nativityAnaly, godOfJoy = words8(Year, Month, Day, Hour, sex)
-    return render(request, "birthday_result.html", {"email": email_t})
-
-def words8(Year, Month, Day, Hour, sex):
-    import re
-    import requests
-    from bs4 import BeautifulSoup
-
-    session = requests.session()
-    myHeaders = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'}
-
-    payload1 = {
-        "_Year": Year,
-        "_Month": Month,
-        "_Day": Day,
-        "_Hour": Hour,
-        "_sex": sex,
-        "_earth": "N",
-        "_method": "A",
-        "txt_eight": "",
-        "txt_twelve": "",
-        "txt_sun_date": "",
-        "txt_moon_date": "",
-        "txt_act": "",
-        "job_kind": "A1",
-    }
-
-    a = session.post("https://www.dearmoney.com.tw/eightwords/result_eight_words_page",
-                     data=payload1, headers=myHeaders)
-    a.encoding = 'utf-8'
-    soup1 = BeautifulSoup(a.text, 'html.parser')
-
-    if a.status_code == 200:
-        main = soup1.select_one("div.ResultContent")
-        main_str = str(main)
-        pattern = re.compile(r'<tr align="center"><td bgcolor="#FFFFFF" height="30"><span style="font-size: 13px"><font color="#660033">劍靈命理網<\/font><\/span> <span style="font-size: 13px"><font color="#330066">https:\/\/www\.dearmoney\.com\.tw\/<\/font><\/span><\/td><\/tr>')
-        main_str = pattern.sub('', main_str)
-        pattern1 = re.compile(r'劍靈八字命盤批算結果</span>\n</div>')
-        main_list = pattern1.split(main_str)
-        main_str = main_list[-1]
-        pattern2 = re.compile(
-            r'<div class="row justify-content-center m-0 p-0 my-3">')
-        main_list = pattern2.split(main_str)
-        horoscope = "{}\n</div>\n</div>".format(main_list[0])
-        pattern3 = re.compile(
-            r'<div class="row m-0 justify-content-center mt-5 mb-3">')
-        main_list2 = pattern3.split(main_list[1])
-        nativityAnalysis = '<div class="row m-0 justify-content-center mt-5 mb-3">{}'.format(
-            main_list2[1])
-        pattern4 = re.compile(r'</font>運，忌')
-        main_list3 = pattern4.split(main_list2[2])
-        pattern5 = re.compile(r'行運喜<font color="#FF3300">')
-        main_list4 = pattern5.split(main_list3[0])
-        tmepGod = main_list4[1]
-        godOfJoy = []
-        for i in tmepGod:
-            godOfJoy.append(i)
-
-        return horoscope, nativityAnalysis, godOfJoy            
+            
 
 
 def birthdaysave(request):  # 待改
     # email = database.child('Humandata').child(globalemail).get().val()
-    email_t = request.POST.get('email')
     born = request.POST.get('birthdate')
     born_split = born.split('-')
     year = born_split[0]
     month = born_split[1]
     day = born_split[2]
+
+    # year = request.POST.get('Year')
+    # month = request.POST.get('Month')
+    # day = request.POST.get('Day')
     time = request.POST.get('time')
     gender = request.POST.get('gender')
-    horoscope, nativityAnalysis, godOfJoy = words8(year, month, day, time, gender)
-    godOfJoy_t = str(godOfJoy)
-    #return HttpResponse("{}+{}".format(godOfJoy_t, godOfJoy))
+
+    # # 檢查 Firebase Admin SDK 是否已經初始化
+    # if not firebase_admin._apps:
+    #     # 設定 Firebase Admin SDK 的認證憑證
+    #     cred = credentials.Certificate(
+    #         "django-8words-firebase-adminsdk-nok9a-2edc05f7c4.json")
+
+    #     firebase_admin.initialize_app(cred, {
+    #         'databaseURL': 'https://django-8words-default-rtdb.firebaseio.com'
+    #     })
+
+    # # 取得Firebase Authentication的使用者ID
+    # user_id = "user-id"
+    # user = auth.get_user(user_id)
+
+    # # 取得使用者的email
+    # email = user.email
+    # print(email)
+
+    # 取得 Firebase Realtime Database 的根節點
+    ref = db.reference('Humandata')
+
+    # 讀取資料
+    data = ref.get()
+
+    id = 0
+    for u in data.keys():
+        id = u
+        # print(u)
+
     dict2 = {"year": year, "month": month,
-             "day": day, "time": time, "gender": gender, "godOfJoy": godOfJoy_t}
-    database.child('Humandata').child(email_t).set(email_t)
-    database.child('Humandata').child(email_t).update(dict2)
-    return render(request, "firebaseLogin.html")
+             "day": day, "time": time, "gender": gender}
+    database.child('Humandata').child(id).set(dict2)
+    # database.child('Humandata').child('Year').push(year)
+    # database.child('Humandata').child('Month').push(month)
+    # database.child('Humandata').child('Day').push(day)
+    # database.child('Humandata').child('Time').push(time)
+    # database.child('Humandata').child('Gender').push(gender)
+
+    # year = database.child('Humandata').child(
+    #     email.split('.')[0]).child('Year').get().val()
+
+    year = database.child('Humandata').child(id).child('year').get().val()
+    month = database.child('Humandata').child(id).child('month').get().val()
+    day = database.child('Humandata').child(id).child('day').get().val()
+    time = database.child('Humandata').child(id).child('time').get().val()
+    gender = database.child('Humandata').child(id).child('gender').get().val()
+    return render(request, "birthdaysave.html", {"year": year, "month": month, "day": day, "time": time, "gender": gender})
+# 以下是徐尉庭增加的
 
 
+def 查詢(request):
+    if request.method == 'POST':
+        if 'search_horoscope' in request.POST:
+            return redirect('birthday')
+
+    return render(request, '查詢.html')
 
 
+def birthday(request):
+    if request.method == 'POST':
+        birthdate = request.POST['birthdate']
+        time = request.POST['time']
+        gender = request.POST['gender']
 
+        # 将birthdate分解为Year, Month, Day
+        Year, Month, Day = birthdate.split('-')
 
+        # 调用爬虫函数
+        horoscope, nativityAnalysis = 生辰八字主業(Year, Month, Day, time, gender)
+
+        # 将结果传递给模板
+        context = {
+            'horoscope': horoscope,
+            'nativityAnalysis': nativityAnalysis,
+        }
+        return render(request, 'birth_result.html', context)
+    else:
+        return render(request, 'birthday.html')
+    # 上面為徐尉庭增加
