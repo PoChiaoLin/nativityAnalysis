@@ -260,3 +260,11 @@ def postReset(request):
     except:
         message = "Something went wrong, Please check the email you provided is registered or not"
         return render(request, "firebaseReset.html", {"msg": message})
+    
+def table(request):
+    email_t = request.post.get("email")
+    ref = db.reference('完整公司資料_2')
+    data = ref.get()  # 数据
+    ref2 = db.reference('Humandata/{}/godOfJoy'.format(email_t))
+    reference_list = ref2.get  # 数据
+    return render(request, 'table.html', {'data': data, 'reference_list': reference_list, "email": email_t})

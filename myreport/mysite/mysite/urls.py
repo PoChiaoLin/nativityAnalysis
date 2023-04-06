@@ -30,6 +30,8 @@ urlpatterns = [
     path('inquire/', views.inquire, name='inquire'),
     path('modifydatas/', views.modifydatas, name='modifydatas'),
     path('postReset/', views.postReset, name='postReset'),
+    path('table/', views.table, name='table'),
+
 
 
 
