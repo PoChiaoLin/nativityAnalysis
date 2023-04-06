@@ -46,66 +46,13 @@ if not firebase_admin._apps:
 firebase = pyrebase.initialize_app(config)
 database = firebase.database()
 
-
-def fireBaseDBtest(request):
-
-    day = database.child('Data').child(
-        'Day').get().val()              # .child()就是往下一層
-    id = database.child('Data').child('Id').get().val()
-    projectname = database.child('Data').child('ProjectName').get().val()
-
-    # database.child("Data").child("Morty")
-
-    # data = {"name": "Mortimer 'Morty' Smith"}
-    # database.child("Data").push(data)
-
-    # data = {"name": "Mortimer 'Morty' Smith"}
-    # database.child("Data").child("Morty").set(data)
-
-    # database.child("Data").child("Morty").update({"name": "Mortiest Morty"})
-
-    # database.child("Data").child("Morty").remove()
-
-    # data = {
-    #     "Data/Morty/": {"name": "Mortimer 'Morty' Smith"},
-    #     "Data/Rick/":  {"name": "Rick Sanchez"}
-    # }
-    # database.update(data)
-
-    # data = {
-    #     "Data/" + database.generate_key(): {"name": "Mortimer 'Morty' Smith"},
-    #     "Data/" + database.generate_key(): {"name": "Rick Sanchez"}
-    # }
-    # database.update(data)
-
-    # data = database.child("Data").get()
-
-    # print(data.val())
-
-    # data = database.child("Data").get()
-
-    # print(data.key())
-
-    # all_Data = database.child("Data").get()
-
-    # for data in all_Data.each():
-    #     print(data.key())
-
-    #     print(data.val())
-
-    return render(request, "fireBaseDBtest.html", {"day": day, "id": id, "projectname": projectname})
-    # return HttpResponse("done")
-
-
-authe = firebase.auth()
-
-
 def signIn(request):
     return render(request, "firebaseLogin.html")
 
 
 def home(request):
-    return render(request, "firebaseHome.html")
+    email = request.POST.get('email')
+    return render(request, "firebaseHome.html", {"email": email})
 
 
 def inquire(request):
@@ -142,11 +89,6 @@ def logout(request):
 
 def signUp(request):
     return render(request, "firebaseRegistration.html")
-
-
-# otp = randint(000000, 999999)
-
-# globalemail = ""
 
 
 def postsignUp(request):
@@ -201,6 +143,7 @@ def words82(request):
     ref = db.reference('Humandata/{}'.format(email_t))
     # database.child('Humandata').child(email_t)
     data = ref.get()
+    # return HttpResponse("{}".format(data))
     Year = data["Humandata"][email_t]["year"]
     Month = data["Humandata"][email_t]["month"]
     Day = data["Humandata"][email_t]["day"]

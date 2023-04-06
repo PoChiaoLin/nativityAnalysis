@@ -5,12 +5,16 @@
     <title>八字结果</title>
 </head>
 <body>
+    <form method="post" action="{% url 'home' %}">
+        {% csrf_token %}
+        <button type="submit">返回主頁</button>
+        <input type="hidden" name="email" value="{{ email }}">
+    </form>    
     <h1>八字结果</h1>
     <h2>命盘</h2>
     {{ horoscope|safe }}
     <h2>命理分析</h2>
     {{ nativityAnalysis|safe }}
     <br>
-    <a href="{% url 'query' %}">返回查询页面</a>
 </body>
 </html>

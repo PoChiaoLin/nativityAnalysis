@@ -1,6 +1,9 @@
-<!-- table2.html -->
-
 {% if data %}
+    <form method="post" action="{% url 'home' %}">
+    {% csrf_token %}
+    <button type="submit">返回主頁</button>
+    <input type="hidden" name="email" value="{{ email }}">
+    </form>
   <table>
     <thead>
       <tr>
