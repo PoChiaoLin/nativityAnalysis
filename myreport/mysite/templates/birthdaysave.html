@@ -1,30 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Birth Data</title>
+	<meta charset="UTF-8">
+	<title>Sign Up</title>
+	<style>
+	body{
+			background-image: url(https://images.unsplash.com/photo-1493723843671-1d655e66ac1c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80);
+		}
+		input{
+			margin-top:20px;
+			height: 30px;
+			width: 150px;
+			border-radius: 5px;
+
+		}
+		input[type="submit"]{
+			background-color: rgba(7, 179, 185, 0.753);
+			color: rgb(255, 255, 255);
+			border: none;
+			border-radius: 5px;
+		}
+
+	</style>
 </head>
 <body>
-<h1>
-BirthYear is {{ year }}
-    </h1>
-<br/>
-<h2>
-BirthMonth is {{ month }}
-    </h2>
-<br>
-<h3>
-BirthDay {{ day }}
-    </h3>
-<br>
-<h4>
-BirthTime {{ time }}
-    </h4>
-<br>
-<h5>
-Gender {{ gender }}
-    </h5>
-<br>
+
+<form action={% url 'modifysave' %} method="post">
+	{% csrf_token %}
+	<br/>
+	<h1>Sign Data</h1>
+
+	<!--加入開始-->
+	<input type="hidden" name="email" value="{{ email }}">
+	<!--加入結束-->
+
+  <p>Please fill in this form</p>
+  <!-- birth-date: -->
+  <label for="birthdate">生日</label>
+  <input type="date" id="birthdate" name="birthdate" min="1969-01-01" max="2022-12-31">
+  <span style="color: red;">（僅可選1969~2022才會有八字資料）</span><br><br>
+
+  <label for="time">出生時間（24小時制）</label>
+  <input type="number" id="time" name="time" min="0" max="23" pattern="[0-9]{1,2}" placeholder="請輸入0~23之間的整數" required>
+  <span style="color: red;">（僅可選0~23才會有八字資料）</span><br><br>
+
+  <label for="gender">性別</label>
+  <select id="gender" name="gender">
+    <option value="M">男</option>
+    <option value="F">女</option>
+  </select><br><br>
+
+  <input type="checkbox" checked="checked" name="remember" style="margin-bottom:15px"> Remember me
+
+  <input type="submit" value="SignUp"><br><br>
+</form>
+
 </body>
 </html>
+
+
 

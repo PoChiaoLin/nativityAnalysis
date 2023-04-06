@@ -45,6 +45,8 @@ if not firebase_admin._apps:
 
 firebase = pyrebase.initialize_app(config)
 database = firebase.database()
+authe = firebase.auth()
+
 
 def signIn(request):
     return render(request, "firebaseLogin.html")
@@ -68,6 +70,7 @@ def postsignIn(request):
     pasw = request.POST.get('pass')
     a = email.split(".")
     email_t = a[0]
+    # return HttpResponse("{}".format(email_t))
     try:
         # if there is no error then signin the user with given email and password
         user = authe.sign_in_with_email_and_password(email, pasw)
@@ -76,7 +79,10 @@ def postsignIn(request):
         return render(request, "firebaseLogin.html", {"message": message})
     session_id = user['idToken']
     request.session['uid'] = str(session_id)
+    request.session['email_t'] = email_t  # 存储 email_t
+    request.session['email'] = email
     return render(request, "firebaseHome.html", {"email": email_t})
+    # return HttpResponse("{}".format(email_t))
 
 
 def logout(request):
@@ -139,18 +145,56 @@ def validate(request):
 
 
 def words82(request):
-    email_t = request.POST.get('email')
-    ref = db.reference('Humandata/{}'.format(email_t))
+    email_t = request.session.get('email_t')
+    # return HttpResponse("{}".format(email_t))
+    ref = db.reference('Humandata/')
     # database.child('Humandata').child(email_t)
     data = ref.get()
     # return HttpResponse("{}".format(data))
-    Year = data["Humandata"][email_t]["year"]
-    Month = data["Humandata"][email_t]["month"]
-    Day = data["Humandata"][email_t]["day"]
-    Hour = data["Humandata"][email_t]["time"]
-    sex = data["Humandata"][email_t]["gender"]
+    Year = data[email_t]["year"]
+    Month = data[email_t]["month"]
+    Day = data[email_t]["day"]
+    Hour = data[email_t]["time"]
+    sex = data[email_t]["gender"]
     horoscope, nativityAnaly, godOfJoy = words8(Year, Month, Day, Hour, sex)
-    return render(request, "birthday_result.html", {"email": email_t})
+    # return HttpResponse("{}".format(email_t))
+    # return render(request, "birthday_result.html", {"email": email_t})
+    return render(request, "birth_result.html", {"email": email_t, "horoscope": horoscope, "nativityAnaly": nativityAnaly})
+
+
+def table(request):
+    email_t = request.session.get('email_t')
+    # return HttpResponse("{}".format(email_t))
+    ref = db.reference('完整公司資料_2')
+    data = ref.get()
+    ref2 = db.reference('Humandata/{}/godOfJoy'.format(email_t))
+    reference_list = ref2.get()
+    company_data = []
+    for key1 in reference_list:
+        if key1 in data:
+            for value in data[key1].keys():
+                company_data.append({
+                    '屬性': data[key1][value]['屬性'],
+                    '股票代碼': data[key1][value]['股票代碼'],
+                    '公司名稱': data[key1][value]['公司名稱'],
+                    '所屬產業': data[key1][value]['所屬產業'],
+                    'New_ROE': data[key1][value]['New_ROE'],
+                    'Next_ROE': data[key1][value]['Next_ROE'],
+                    'statuses': data[key1][value]['statuses']
+                })
+    return render(request, 'table.html', {'data': company_data, "email": email_t})
+
+
+# def table(request):
+#     email_t = request.session.get('email_t')
+#     # return HttpResponse("{}".format(email_t))
+#     ref = db.reference('完整公司資料_2')
+#     data = ref.get()  # 数据
+#     ref2 = db.reference('Humandata/{}/godOfJoy'.format(email_t))
+#     reference_list = ref2.get()  # 数据
+#     data1 = str(data)
+#     # return HttpResponse(data1)
+#     return render(request, 'table.html', {'data': data, 'reference_list': reference_list, "email": email_t})
 
 
 def words8(Year, Month, Day, Hour, sex):
@@ -234,7 +278,12 @@ def birthdaysave(request):
 
 
 def modifydatas(request):
-    email_t = request.POST.get('email')
+    email_t = request.session.get('email_t')
+    return render(request, "birthdaysave.html", {"email": email_t})
+
+
+def modifysave(request):
+    email_t = request.session.get('email_t')
     born = request.POST.get('birthdate')
     born_split = born.split('-')
     year = born_split[0]
@@ -248,11 +297,30 @@ def modifydatas(request):
     dict2 = {"year": year, "month": month,
              "day": day, "time": time, "gender": gender, "godOfJoy": godOfJoy_t}
     database.child('Humandata').child(email_t).update(dict2)
-    return render(request, "firebaseLogin.html", {"email": email_t})
+    return render(request, "firebaseHome.html", {"email": email_t})
+
+
+# def modifydatas(request):
+#     email_t = request.POST.get('email')
+#     born = request.POST.get('birthdate')
+#     born_split = born.split('-')
+#     year = born_split[0]
+#     month = born_split[1]
+#     day = born_split[2]
+#     time = request.POST.get('time')
+#     gender = request.POST.get('gender')
+#     horoscope, nativityAnalysis, godOfJoy = words8(
+#         year, month, day, time, gender)
+#     godOfJoy_t = str(godOfJoy)
+#     dict2 = {"year": year, "month": month,
+#              "day": day, "time": time, "gender": gender, "godOfJoy": godOfJoy_t}
+#     database.child('Humandata').child(email_t).update(dict2)
+#     return render(request, "firebaseLogin.html", {"email": email_t})
 
 
 def postReset(request):
-    email = request.POST.get('email')
+    email = request.session.get('email')
+    # return HttpResponse("{}".format(email))
     try:
         authe.send_password_reset_email(email)
         message = "A email to reset password is succesfully sent"
@@ -260,11 +328,16 @@ def postReset(request):
     except:
         message = "Something went wrong, Please check the email you provided is registered or not"
         return render(request, "firebaseReset.html", {"msg": message})
-    
-def table(request):
-    email_t = request.post.get("email")
-    ref = db.reference('完整公司資料_2')
-    data = ref.get()  # 数据
-    ref2 = db.reference('Humandata/{}/godOfJoy'.format(email_t))
-    reference_list = ref2.get  # 数据
-    return render(request, 'table.html', {'data': data, 'reference_list': reference_list, "email": email_t})
+
+
+# def table(request):
+#     email_t = request.POST.get("email")
+#     ref = db.reference('完整公司資料_2')
+#     data = ref.get()  # 数据
+#     ref2 = db.reference('Humandata/{}/godOfJoy'.format(email_t))
+#     reference_list = ref2.get  # 数据
+#     return render(request, 'table.html', {'data': data, 'reference_list': reference_list, "email": email_t})
+
+def home(request):
+    email_t = request.session.get('email_t')
+    return render(request, "firebaseHome.html", {"email": email_t})

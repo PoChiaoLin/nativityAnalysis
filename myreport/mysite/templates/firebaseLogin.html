@@ -1,11 +1,19 @@
-{% if message %}
-<script>
-    alert('{{ message }}');
-</script>
-{% endif %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+        window.onload = function() {
+            var confirmed = localStorage.getItem("confirmed");
+            if (!confirmed) {
+                var message = "限年滿六個月-54歲使用，非區間範圍可能查無資料。";
+                if (confirm(message)) {
+                    localStorage.setItem("confirmed", "true");
+                } else {
+                    window.location.href = "https://www.google.com"; //如果使用者拒絕確認規則，可以將使用者導向其他網頁
+                }
+            }
+        }
+    </script>
     <meta charset="UTF-8">
     <title>Sign In</title>
     <style>
@@ -37,7 +45,14 @@
     </style>
 </head>
 <body>
-
+    <script>
+        {% if not confirmed %}
+            var message = "限年滿六個月-54歲使用，非區間範圍可能查無資料。";
+            if (!confirm(message)) {
+                window.location.href = "https://www.google.com"; //如果使用者拒絕確認規則，可以將使用者導向其他網頁
+            }
+        {% endif %}
+    </script>    
 <form action={% url 'postsignIn' %} method="post">
     {% csrf_token %}
     <br/>
