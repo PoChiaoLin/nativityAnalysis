@@ -1,0 +1,34 @@
+<!-- table2.html -->
+
+{% if data %}
+  <table>
+    <thead>
+      <tr>
+        <th>屬性</th>
+        <th>股票代碼</th>
+        <th>公司名稱</th>
+        <th>所屬產業</th>
+        <th>New_ROE</th>
+        <th>Next_ROE</th>
+        <th>Statuses</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for key1 in reference_list %}
+        {% if key1 in data %}
+          {% for value in data[key1].keys %}
+            <tr>
+              <td>{{ data[key1][value].屬性 }}</td>
+              <td>{{ data[key1][value].股票代碼 }}</td>
+              <td>{{ data[key1][value].公司名稱 }}</td>
+              <td>{{ data[key1][value].所屬產業 }}</td>
+              <td>{{ data[key1][value].New_ROE }}</td>
+              <td>{{ data[key1][value].Next_ROE }}</td>
+              <td>{{ data[key1][value].statuses }}</td>
+            </tr>
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
