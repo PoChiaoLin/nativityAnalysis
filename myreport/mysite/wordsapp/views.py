@@ -136,9 +136,9 @@ def validate(request):
                 temp_otp = int(user_otp)
                 if otp == temp_otp:
                     return render(request, "birthday.html", {"email": email_t})
-                else:  # 加入刪除帳戶的程式碼
-                    # user.delete()
-                    return HttpResponse("OTP不正確，請重新輸入")
+                else:
+                    message = "驗證碼錯誤！！請重新輸入"
+                    return render(request, "verify.html", {"email": email_t, "message": message})
 
         else:
             continue
