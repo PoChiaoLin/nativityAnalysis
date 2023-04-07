@@ -38,7 +38,7 @@ config = {
 if not firebase_admin._apps:
     # 設定 Firebase Admin SDK 的認證憑證
     cred = credentials.Certificate(
-        "django-8words-2c6a1-firebase-adminsdk-usxvz-3e2e8a279e.json")
+        "C:\Bob\\nativityAnalysis\myreport\mysite\wordsapp\django-8words-2c6a1-firebase-adminsdk-usxvz-3e2e8a279e.json")
     firebase_admin.initialize_app(cred, {
         'databaseURL': 'https://django-8words-2c6a1-default-rtdb.firebaseio.com/'
     })
@@ -120,28 +120,46 @@ def postsignUp(request):
     return render(request, "verify.html", {"email": t_email})
 
 
+# def validate(request):
+#     email_t = request.POST.get('email')
+#     # return HttpResponse("{}".format(email_t))
+#     user_otp = request.POST.get('otp')
+#     ref = db.reference('Humandata')
+
+#     # 讀取資料
+#     data = ref.get()
+#     for m_t in data.keys():
+#         if m_t == email_t:
+#             # return HttpResponse("成功")
+#             for d_t in data[email_t].keys():
+#                 otp = int(data[email_t][d_t]["otp"])
+#                 temp_otp = int(user_otp)
+#                 if otp != temp_otp:
+#                     return render(request, "verifyE.html", {"email": email_t})
+#                 else:
+#                     return render(request, "birthday.html", {"email": email_t})
+
+#         else:
+#             continue
 def validate(request):
     email_t = request.POST.get('email')
-    # return HttpResponse("{}".format(email_t))
     user_otp = request.POST.get('otp')
     ref = db.reference('Humandata')
 
-    # 讀取資料
     data = ref.get()
     for m_t in data.keys():
         if m_t == email_t:
-            # return HttpResponse("成功")
             for d_t in data[email_t].keys():
                 otp = int(data[email_t][d_t]["otp"])
                 temp_otp = int(user_otp)
-                if otp == temp_otp:
-                    return render(request, "birthday.html", {"email": email_t})
+                if otp != temp_otp:
+                    return render(request, "verifyE.html", {"email": email_t, "invalid": True})
                 else:
-                    message = "驗證碼錯誤！！請重新輸入"
-                    return render(request, "verify.html", {"email": email_t, "message": message})
+                    return render(request, "birthday.html", {"email": email_t})
 
-        else:
-            continue
+    # 如果找不到电子邮件，或者循环结束后仍未找到匹配项，则显示错误消息。
+    return render(request, "verifyE.html", {"email": email_t, "invalid": True})
+    
 
 
 def words82(request):
@@ -157,7 +175,8 @@ def words82(request):
     Hour = data[email_t]["time"]
     sex = data[email_t]["gender"]
     horoscope, nativityAnaly, godOfJoy = words8(Year, Month, Day, Hour, sex)
-    # return HttpResponse("{}".format(email_t))
+    # b = str(nativityAnaly)
+    # return HttpResponse(b)
     # return render(request, "birthday_result.html", {"email": email_t})
     return render(request, "birth_result.html", {"email": email_t, "horoscope": horoscope, "nativityAnaly": nativityAnaly})
 
